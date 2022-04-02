@@ -558,7 +558,7 @@ public class MapItemServiceImpl implements IMapItemService {
             filename = "thumb_" + filename + ".png";
             mapItem.getImageUrl().setThumbnailUrl(path[0] + "/" + filename);
             mapItem.getImageUrl().setTilesDir(path[1]);
-            mapItem.setRootPath(savePath);
+            // mapItem.setRootPath(savePath);
             mapItem.setResourceDir(savePath.split(resourcePath)[1]);
             mapItem.setProcessParam(new ProcessParam(mapItem.getId(), loadPath,savePath + path[0],savePath + path[1]));
         }
@@ -778,9 +778,14 @@ public class MapItemServiceImpl implements IMapItemService {
             ImageUrl imageUrl = mapItem.getImageUrl();
             //if(!FileUtils.deleteFile(mapItem.getRootPath() + imageUrl.getOriginalUrl()))
             //    errorMsg += " original";
-            if(!FileUtils.deleteFile(mapItem.getRootPath() + imageUrl.getThumbnailUrl()))
+            // if(!FileUtils.deleteFile(mapItem.getRootPath() + imageUrl.getThumbnailUrl()))
+            //     errorMsg += " thumbnail";
+            // if(!FileUtils.deleteDirectory(mapItem.getRootPath() + imageUrl.getTilesDir()))
+            //     errorMsg += " tiles";
+
+            if(!FileUtils.deleteFile(resourcePath + mapItem.getResourceDir() + imageUrl.getThumbnailUrl()))
                 errorMsg += " thumbnail";
-            if(!FileUtils.deleteDirectory(mapItem.getRootPath() + imageUrl.getTilesDir()))
+            if(!FileUtils.deleteDirectory(resourcePath + mapItem.getResourceDir() + imageUrl.getTilesDir()))
                 errorMsg += " tiles";
 
             if (!errorMsg.equals("error:")){

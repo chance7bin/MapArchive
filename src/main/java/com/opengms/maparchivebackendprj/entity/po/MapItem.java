@@ -36,7 +36,7 @@ public class MapItem extends GenericItem {
     boolean hasNeedManual = true; //是否需要人工处理
     // thumbnailStatus tileStatus hasMatchMetaData hasCalcCoordinate只要其中之一没有完成就要人工处理
 
-    String rootPath; //地图条目上传时图片存放的根路径
+    // String rootPath; //地图条目上传时图片存放的根路径
     String resourceDir; //资源存放目录
 
     Map<String, Object> metadata; //元数据信息(新)
