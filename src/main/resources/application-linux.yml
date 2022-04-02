@@ -1,0 +1,13 @@
+spring:
+  data:
+    mongodb:
+      uri: mongodb://172.21.213.33/MapArchive
+
+
+resourcePath: /home/MapArchive/mapArchiveFiles
+
+logging:
+  config: classpath:logging-config.xml
+
+logback:
+  LOG_HOME: /home/MapArchive/logs

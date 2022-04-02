@@ -1,0 +1,22 @@
+#swagger:
+#  enable: true
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://172.21.213.33/MapArchiveDB
+#      uri: mongodb://127.0.0.1/MapArchive
+#  datasource:
+#    driver-class-name: org.sqlite.JDBC
+#    url: jdbc:sqlite:E:/mapArchiveFiles/demo.mbtiles
+
+resourcePath: E:/mapArchiveFiles
+
+#logging:
+#  config: classpath:logging-config.xml
+
+#logback:
+#  LOG_HOME: E:/mapArchiveFiles/logs
+
+
+#ipAndPort: "http://127.0.0.1:8999"
