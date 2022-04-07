@@ -1,39 +1,40 @@
 package com.opengms.maparchivebackendprj.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.opengms.maparchivebackendprj.dao.IClassificationTreeDao;
 import com.opengms.maparchivebackendprj.dao.ILogDao;
 import com.opengms.maparchivebackendprj.dao.IMapItemCLSDao;
 import com.opengms.maparchivebackendprj.dao.IMapItemDao;
 import com.opengms.maparchivebackendprj.entity.bo.JsonResult;
 import com.opengms.maparchivebackendprj.entity.bo.PageableResult;
+import com.opengms.maparchivebackendprj.entity.bo.config.DataServer;
+import com.opengms.maparchivebackendprj.entity.bo.mapItem.GeoInfo;
 import com.opengms.maparchivebackendprj.entity.bo.mapItem.ImageUrl;
+import com.opengms.maparchivebackendprj.entity.bo.mapItem.ProcessParam;
 import com.opengms.maparchivebackendprj.entity.dto.FindDTO;
 import com.opengms.maparchivebackendprj.entity.dto.SpecificFindDTO;
 import com.opengms.maparchivebackendprj.entity.dto.mapItem.*;
-import com.opengms.maparchivebackendprj.entity.po.MapItemCLS;
-import com.opengms.maparchivebackendprj.service.*;
-import com.opengms.maparchivebackendprj.entity.bo.mapItem.GeoInfo;
-import com.opengms.maparchivebackendprj.entity.bo.mapItem.ProcessParam;
 import com.opengms.maparchivebackendprj.entity.enums.MapClassification;
 import com.opengms.maparchivebackendprj.entity.enums.OperateTypeEnum;
 import com.opengms.maparchivebackendprj.entity.enums.StatusEnum;
-import com.opengms.maparchivebackendprj.entity.po.FileInfo;
-import com.opengms.maparchivebackendprj.entity.po.LogInfo;
-import com.opengms.maparchivebackendprj.entity.po.MapItem;
+import com.opengms.maparchivebackendprj.entity.po.*;
+import com.opengms.maparchivebackendprj.service.*;
 import com.opengms.maparchivebackendprj.utils.FileUtils;
 import com.opengms.maparchivebackendprj.utils.ImageUtils;
 import com.opengms.maparchivebackendprj.utils.ResultUtils;
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.geo.Box;
 import org.springframework.data.geo.Point;
-import org.springframework.data.mongodb.core.geo.GeoJson;
 import org.springframework.data.mongodb.core.geo.GeoJsonMultiPolygon;
 import org.springframework.data.mongodb.core.geo.GeoJsonPolygon;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.util.*;
@@ -49,6 +50,12 @@ public class MapItemServiceImpl implements IMapItemService {
 
     @Value("${resourcePath}")
     private String resourcePath;
+
+    // @Value("${dataServerPath}")
+    // private String dataServerPath;
+
+    @Resource(name="defaultDataServer")
+    DataServer defaultDataServer;
 
     @Value("${mapItemDir}")
     private String mapItemDir;
@@ -74,12 +81,13 @@ public class MapItemServiceImpl implements IMapItemService {
     @Autowired
     IMapItemCLSDao mapItemCLSDao;
 
-
+    @Autowired
+    IClassificationTreeDao classificationTreeDao;
 
     // 异步调用处理任务，防止请求阻塞
     @Async
     @Override
-    public void process(ProcessDTO processDTO, String username, MapItemCLS mapItemCLS) {
+    public void process(ProcessDTO processDTO, String username, MetadataTable mapItemCLS) {
 
         log.info("process invoke begin [ {} ]", new Date());
 
@@ -91,10 +99,11 @@ public class MapItemServiceImpl implements IMapItemService {
 //        savePath = savePath.replace("\\", "/");
 
         // 自动生成保存路径
-        String cls = mapItemCLS.getNameEn();
-        String savePath = resourcePath +  "/" + cls;
+        String cls = mapItemCLS.getCollection();
+        // String savePath = resourcePath +  "/" + cls;
+        String savePath = defaultDataServer.getLoadPath() + mapItemDir +  "/" + cls;
 
-        MapClassification mapCLSByNameEn = MapClassification.getMapCLSByNameEn(cls);
+        // MapClassification mapCLSByNameEn = MapClassification.getMapCLSByNameEn(cls);
 
         File file = new File(processingPath);
 
@@ -118,12 +127,12 @@ public class MapItemServiceImpl implements IMapItemService {
 
             mapItem.setName(file1.getName());
             mapItem.setAuthor(username);
-            mapItem.setMapCLS(mapCLSByNameEn);
+            mapItem.setMapCLSId(processDTO.getMapCLSId());
             mapItemDao.insert(mapItem);
 
             itemListId.add(mapItem.getId());
 
-            initMapItem(mapItem,file1.getPath(),savePath,processingPath, processDTO ,null);
+            asyncService.initMapItem(mapItem,file1.getPath(),savePath,processingPath, processDTO ,null);
 
         }
 
@@ -134,17 +143,19 @@ public class MapItemServiceImpl implements IMapItemService {
 
     @Async
     @Override
-    public void insert(MapItemAddDTO mapItemAddDTO, String username, MapItemCLS mapItemCLS) {
+    public void insert(MapItemAddDTO mapItemAddDTO, String username, MetadataTable mapItemCLS) {
 
 
 
-        String processingPath = resourcePath +  "/" + mapItemCLS.getNameEn() + "/file";
-        String savePath = resourcePath +  "/" + mapItemCLS.getNameEn();
+        // String processingPath = resourcePath +  "/" + mapItemCLS.getNameEn() + "/file";
+        String processingPath = defaultDataServer.getLoadPath() + mapItemDir +  "/" + mapItemCLS.getCollection() + "/file";
+        // String savePath = resourcePath +  "/" + mapItemCLS.getNameEn();
+        String savePath = defaultDataServer.getLoadPath() + mapItemDir +  "/" + mapItemCLS.getCollection();
 
 
-        String cls = mapItemCLS.getNameEn();
+        // String cls = mapItemCLS.getNameEn();
 
-        MapClassification mapCLSByNameEn = MapClassification.getMapCLSByNameEn(cls);
+        // MapClassification mapCLSByNameEn = MapClassification.getMapCLSByNameEn(cls);
 
         // List<MapItem> mapItemList = new ArrayList<>();
         List<String> itemListId = new ArrayList<>();
@@ -154,7 +165,7 @@ public class MapItemServiceImpl implements IMapItemService {
             MapItem mapItem = new MapItem();
             mapItem.setAuthor(username);
             mapItem.setName(fileInfo.getFileName());
-            mapItem.setMapCLS(mapCLSByNameEn);
+            mapItem.setMapCLSId(mapItemAddDTO.getMapCLSId());
             mapItemDao.insert(mapItem);
 
             itemListId.add(mapItem.getId());
@@ -169,7 +180,7 @@ public class MapItemServiceImpl implements IMapItemService {
                 mapItemAddDTO.isGenerateTiles());
 
             // mapItemList.add(initMapItem(mapItem,fileInfo.getPath(),savePath,processingPath, processDTO, fileInfo));
-            initMapItem(mapItem,fileInfo.getPath(),savePath,processingPath, processDTO, fileInfo);
+            asyncService.initMapItem(mapItem,fileInfo.getPath(),savePath,processingPath, processDTO, fileInfo);
         }
 
         logDao.insert(new LogInfo(username,itemListId, OperateTypeEnum.UPLOAD,new Date()));
@@ -241,7 +252,7 @@ public class MapItemServiceImpl implements IMapItemService {
         }
 
 
-        List<MapClassification> mapClassifications = buildClassifications(findDTO.getMapCLSId());
+        List<String> mapClassifications = buildClassifications(findDTO.getMapCLSId());
 
 
         List<MapItem> mapItemList = null;
@@ -347,7 +358,7 @@ public class MapItemServiceImpl implements IMapItemService {
             curQueryField = "name";
         }
 
-        List<MapClassification> mapClassifications = buildClassifications(findDTO.getMapCLSId());
+        List<String> mapClassifications = buildClassifications(findDTO.getMapCLSId());
 
         long l;
         List<GeoJsonPolygon> queryPolygon = getQueryPolygon(leftLon, rightLon, bottomLat, upperLat);
@@ -371,7 +382,7 @@ public class MapItemServiceImpl implements IMapItemService {
         String searchText = findDTO.getSearchText();
         String curQueryField = findDTO.getCurQueryField();
 
-        List<MapClassification> mapClassifications = buildClassifications(findDTO.getMapCLSId());
+        List<String> mapClassifications = buildClassifications(findDTO.getMapCLSId());
 
 
         List<MapItem> mapItemList =
@@ -388,7 +399,7 @@ public class MapItemServiceImpl implements IMapItemService {
         String searchText = findDTO.getSearchText();
         String curQueryField = findDTO.getCurQueryField();
 
-        List<MapClassification> mapClassifications = buildClassifications(findDTO.getMapCLSId());
+        List<String> mapClassifications = buildClassifications(findDTO.getMapCLSId());
 
 
         long count =
@@ -405,7 +416,7 @@ public class MapItemServiceImpl implements IMapItemService {
         String curQueryField, String searchText,
         GeoJsonPolygon polygon, String mapCLSId, Pageable pageable){
 
-        List<MapClassification> mapClassifications = buildClassifications(mapCLSId);
+        List<String> mapClassifications = buildClassifications(mapCLSId);
 
         List<MapItem> mapItemList = mapItemDao.findBySearchTextAndPolygonAndPageable(curQueryField,searchText,polygon,mapClassifications,pageable);
 
@@ -419,36 +430,69 @@ public class MapItemServiceImpl implements IMapItemService {
     /**
      * 构建classifications集合,如果没有childrenId则表示只查询一个分类条目，有的话表示有多个分类条目
      * @param clsId
-     * @return java.util.List<com.opengms.maparchivebackendprj.entity.enums.MapClassification>
      * @Author bin
      **/
-    private List<MapClassification> buildClassifications(String clsId){
-        List<MapClassification> classifications = new ArrayList<>();
+    public List<String> buildClassifications(String clsId){
+        ClassificationTree basic = classificationTreeDao.findByVersion("basic");
+        return buildClassifications(clsId, basic);
+    }
+
+    private List<String> buildClassifications(String clsId, ClassificationTree classificationTree){
+        List<String> classifications = new ArrayList<>();
 
         // 判断是否传入clsId
         if (genericService.isEmptyString(clsId))
             return classifications;
 
-        MapItemCLS cls = mapItemCLSDao.findById(clsId);
+        JSONObject cls = findTreeItemById(clsId, classificationTree.getTree());
         //判断该cls是否存在
         if (!genericService.isExist(cls))
             return classifications;
 
-        List<String> childrenId = cls.getChildrenId();
-        if (childrenId == null || childrenId.size() == 0){
-            if (cls.getNameEn() != null){
-                MapClassification mapCLSByNameEn = MapClassification.getMapCLSByNameEn(cls.getNameEn());
-                if (mapCLSByNameEn != null){
-                    classifications.add(mapCLSByNameEn);
-                }
-            }
+        JSONArray children = cls.getJSONArray("children");
+        if (children == null || children.size() == 0){
+            // if (cls.getNameEn() != null){
+            //     MapClassification mapCLSByNameEn = MapClassification.getMapCLSByNameEn(cls.getNameEn());
+            //     if (mapCLSByNameEn != null){
+            //         classifications.add(mapCLSByNameEn.getNameEn());
+            //     }
+            // }
+            classifications.add(cls.getString("id"));
         }
         else {
-            for (String child : childrenId) {
-                classifications.addAll(buildClassifications(child));
+            // for (String child : childrenId) {
+            //     classifications.addAll(buildClassifications(child));
+            // }
+            for (int i = 0; i < children.size(); i++) {
+                JSONObject child = children.getJSONObject(i);
+                classifications.addAll(buildClassifications(child.getString("id"),classificationTree));
             }
         }
         return classifications;
+    }
+
+    private JSONObject findTreeItemById(String id, JSONArray tree){
+
+        JSONObject result = null;
+        for (int i = 0; i < tree.size(); i++) {
+
+            JSONObject item = tree.getJSONObject(i);
+            if (item.getString("id").equals(id)){
+                result = item;
+                break;
+            }
+            JSONArray children = item.getJSONArray("children");
+            if (children != null && children.size() != 0){
+                result = findTreeItemById(id,children);
+                if (result != null){
+                    break;
+                }
+            }
+
+        }
+
+        return result;
+
     }
 
     //得到所指文件列表
@@ -469,114 +513,12 @@ public class MapItemServiceImpl implements IMapItemService {
     }
 
 
-    /**
-     * 地图条目入库
-     * @param mapItem 地图条目
-     * @param loadPath 加载的文件路径
-     * @param savePath 生成新文件保存的路径
-     * @param rootPath 在多级目录的情况下，以该路径作为根路径进行切分，按照该路径后面的格式生成对应的文件夹
-     * @param processDTO 批量处理所传入的参数
-     * @param fileInfo 与地图条目关联的文件信息(上传的功能才关联)
-     * @return com.example.maparchivebackend.entity.po.MapItem
-     * @Author bin
-     **/
-    private MapItem initMapItem(
-        MapItem mapItem,
-        String loadPath, String savePath, String rootPath,
-        ProcessDTO processDTO,FileInfo fileInfo){
-
-        // MapItem mapItem = new MapItem();
-        mapItem.setProcessStatus(StatusEnum.Started);
-
-        //文件与地图条目进行关联
-        if(fileInfo != null){
-            mapItem.setRelativeFileId(fileInfo.getId());
-        }
-
-
-        if (processDTO.isMatchMetadata()){
-            mapItem = matchMetadata(mapItem,mapItem.getMapCLS(),processDTO.getMetadataTable());
-
-        }
-
-        if (processDTO.isCalcGeoInfo()){
-            mapItem = setItemGeo(mapItem, mapItem.getMapCLS());
-        }
-
-
-        String type = FileUtils.getFileType(mapItem.getName());
-        // 执行脚本的文件后缀必须为 .jpg 或者是 .png  或者是.tif .tiff
-        if (type.equals("jpg") || type.equals("png")
-            || type.equals("tif") || type.equals("tiff")
-            || type.equals("TIF") || type.equals("TIFF")){
-
-            //加载的文件路径
-            // String filePath = loadPath;
-            //新文件保存路径
-            String thumbnailPath = "/" + "thumbnail";
-            String tilesPath = "/" + "tiles";
-            //对多级目录的处理
-            String[] path = FileUtils.buildMultiDirPath(loadPath, rootPath, thumbnailPath, tilesPath);
-
-            File loadFile = new File(loadPath);
-
-            // 得到图片的元数据
-            try {
-                // TODO: 2022/3/16 正常图片的宽度应该大于高度，如果不是这样的话可能图片需要做旋转的处理
-                mapItem.setImageMetadata(ImageUtils.getImageInfo(loadPath));
-            } catch (Exception e){
-                mapItem.setImageMetadata(null);
-            }
-
-            path[1] += "/" + FileUtils.getFilenameNoSuffix(loadFile);
-
-            // 异步处理地图
-            if (processDTO.isGenerateThumbnail()){
-                generateThumbnailImage(mapItem,loadPath,savePath + path[0]);
-            }
-
-            if (processDTO.isGenerateTiles()){
-                generateTiles(mapItem,loadPath,savePath + path[1]);
-            }
-
-            // 如果既没有生成缩略图也没有切片，那处理的状态设置为Finished
-            if (!processDTO.isGenerateThumbnail() && !processDTO.isGenerateTiles()){
-                mapItem.setProcessStatus(StatusEnum.Finished);
-            }
-
-            if (asyncService.hasProcessFinish(mapItem)){
-                mapItem.setHasNeedManual(false);
-            }
-
-
-            // 设置生成的图片路径
-            // mapItem中存的都是相对路径，定位文件位置用rootPath定位
-//            String originalUrl = fileInfo.getPath().replace("\\", "/");
-//            savePath = savePath.replace("\\", "/");
-            mapItem.getImageUrl().setOriginalUrl(loadPath);
-            String filename = FileUtils.getFilenameNoSuffix(loadFile);
-            filename = "thumb_" + filename + ".png";
-            mapItem.getImageUrl().setThumbnailUrl(path[0] + "/" + filename);
-            mapItem.getImageUrl().setTilesDir(path[1]);
-            // mapItem.setRootPath(savePath);
-            mapItem.setResourceDir(savePath.split(resourcePath)[1]);
-            mapItem.setProcessParam(new ProcessParam(mapItem.getId(), loadPath,savePath + path[0],savePath + path[1]));
-        }
-
-
-        return mapItemDao.save(mapItem);
-    }
-
-
-
-
-
     @Override
     public JsonResult getProcessingListStatusIsProcessing(SpecificFindDTO findDTO, List<StatusEnum> statusEnums) {
 
         Pageable pageable = genericService.getPageable(findDTO);
 
-        List<MapClassification> mapClassifications = buildClassifications(findDTO.getMapCLSId());
+        List<String> mapClassifications = buildClassifications(findDTO.getMapCLSId());
 
         List<MapItem> mapItemList = mapItemDao.findBySearchTextAndStatus(findDTO.getCurQueryField(),findDTO.getSearchText(),statusEnums, mapClassifications,pageable);
 
@@ -589,7 +531,7 @@ public class MapItemServiceImpl implements IMapItemService {
 
         Pageable pageable = genericService.getPageable(findDTO);
 
-        List<MapClassification> mapClassifications = buildClassifications(findDTO.getMapCLSId());
+        List<String> mapClassifications = buildClassifications(findDTO.getMapCLSId());
 
         List<MapItem> mapItemList = mapItemDao.findByStatusAndHasNeedManual(findDTO.getCurQueryField(),findDTO.getSearchText(),statusEnums, false, mapClassifications,pageable);
 
@@ -603,7 +545,7 @@ public class MapItemServiceImpl implements IMapItemService {
 
         Pageable pageable = genericService.getPageable(findDTO);
 
-        List<MapClassification> mapClassifications = buildClassifications(findDTO.getMapCLSId());
+        List<String> mapClassifications = buildClassifications(findDTO.getMapCLSId());
 
         List<MapItem> mapItemList = mapItemDao.findByStatusAndHasNeedManual(findDTO.getCurQueryField(),findDTO.getSearchText(),statusEnums, true, mapClassifications,pageable);
 
@@ -615,7 +557,7 @@ public class MapItemServiceImpl implements IMapItemService {
     public JsonResult getProcessingListStatusIsError(SpecificFindDTO findDTO, List<StatusEnum> statusEnums) {
         Pageable pageable = genericService.getPageable(findDTO);
 
-        List<MapClassification> mapClassifications = buildClassifications(findDTO.getMapCLSId());
+        List<String> mapClassifications = buildClassifications(findDTO.getMapCLSId());
 
         List<MapItem> mapItemList = mapItemDao.findBySearchTextAndStatus(findDTO.getCurQueryField(),findDTO.getSearchText(),statusEnums, mapClassifications,pageable);
 
@@ -624,7 +566,7 @@ public class MapItemServiceImpl implements IMapItemService {
 
     @Override
     public JsonResult countProcessingListStatusIsProcessing(SpecificFindDTO findDTO, List<StatusEnum> statusEnums) {
-        List<MapClassification> mapClassifications = buildClassifications(findDTO.getMapCLSId());
+        List<String> mapClassifications = buildClassifications(findDTO.getMapCLSId());
 
         long count = mapItemDao.countByStatus(findDTO.getCurQueryField(),findDTO.getSearchText(),statusEnums,mapClassifications);
 
@@ -633,7 +575,7 @@ public class MapItemServiceImpl implements IMapItemService {
 
     @Override
     public JsonResult countProcessingListStatusIsFinished(SpecificFindDTO findDTO, List<StatusEnum> statusEnums) {
-        List<MapClassification> mapClassifications = buildClassifications(findDTO.getMapCLSId());
+        List<String> mapClassifications = buildClassifications(findDTO.getMapCLSId());
 
         long count = mapItemDao.countByStatusAndHasNeedManual(findDTO.getCurQueryField(),findDTO.getSearchText(),statusEnums, false,mapClassifications);
 
@@ -642,7 +584,7 @@ public class MapItemServiceImpl implements IMapItemService {
 
     @Override
     public JsonResult countProcessingListNeedManual(SpecificFindDTO findDTO, List<StatusEnum> statusEnums) {
-        List<MapClassification> mapClassifications = buildClassifications(findDTO.getMapCLSId());
+        List<String> mapClassifications = buildClassifications(findDTO.getMapCLSId());
 
         long count = mapItemDao.countByStatusAndHasNeedManual(findDTO.getCurQueryField(),findDTO.getSearchText(),statusEnums, true,mapClassifications);
 
@@ -651,7 +593,7 @@ public class MapItemServiceImpl implements IMapItemService {
 
     @Override
     public JsonResult countProcessingListStatusIsError(SpecificFindDTO findDTO, List<StatusEnum> statusEnums) {
-        List<MapClassification> mapClassifications = buildClassifications(findDTO.getMapCLSId());
+        List<String> mapClassifications = buildClassifications(findDTO.getMapCLSId());
 
         long count = mapItemDao.countByStatus(findDTO.getCurQueryField(),findDTO.getSearchText(),statusEnums,mapClassifications);
 
@@ -665,36 +607,12 @@ public class MapItemServiceImpl implements IMapItemService {
 
         Pageable pageable = genericService.getPageable(findDTO);
 
-        List<MapItem> mapItemList = mapItemDao.findByStatus(Arrays.asList(StatusEnum.Finished),pageable);
+        List<MapItem> mapItemList = mapItemDao.findByStatusAndHasNeedManual(Arrays.asList(StatusEnum.Finished),true,pageable);
+
 
         for (MapItem mapItem : mapItemList) {
 
-            ProcessParam param = mapItem.getProcessParam();
-
-            mapItem.setProcessStatus(StatusEnum.Started);
-
-            if (processDTO.isMatchMetadata() && !mapItem.isHasMatchMetaData()){
-                mapItem = matchMetadata(mapItem, mapItem.getMapCLS(), null);
-            }
-
-            if (processDTO.isCalcGeoInfo() && !mapItem.isHasCalcCoordinate()){
-                mapItem = setItemGeo(mapItem,mapItem.getMapCLS());
-            }
-
-            if (processDTO.isGenerateThumbnail() && (mapItem.getThumbnailStatus() != StatusEnum.Finished)){
-                generateThumbnailImage(mapItem,param.getInputPath(),param.getThumbnailOutputDir());
-            }
-
-            if (processDTO.isGenerateTiles() && (mapItem.getTileStatus() != StatusEnum.Finished)){
-                generateTiles(mapItem,param.getInputPath(),param.getTilesOutputDir());
-            }
-
-            // 如果既没有生成缩略图也没有切片，那处理的状态设置为Finished
-            if (!processDTO.isGenerateThumbnail() && !processDTO.isGenerateTiles()){
-                mapItem.setProcessStatus(StatusEnum.Finished);
-            }
-
-            mapItemDao.save(mapItem);
+            asyncService.batchProcess(mapItem,processDTO);
 
         }
 
@@ -730,7 +648,8 @@ public class MapItemServiceImpl implements IMapItemService {
         }
 
         //String path = mapItem.getRootPath() + mapItem.getImageUrl().getOriginalUrl();
-        String path = mapItem.getImageUrl().getOriginalUrl();
+        String loadPath = genericService.getLoadPath(mapItem.getServer());
+        String path = loadPath + mapItem.getImageUrl().getOriginalUrl();
 
         File file = new File(path);
         if (!file.exists()){
@@ -744,6 +663,7 @@ public class MapItemServiceImpl implements IMapItemService {
     @Override
     public void downloadBatchItem(List<String> mapItemIdList, HttpServletResponse response) {
 
+        // String zipPath = resourcePath + mapItemDir + "/downloadZip/download.zip";
         String zipPath = resourcePath + mapItemDir + "/downloadZip/download.zip";
         List<File> fileList = new ArrayList<>();
         for (String id : mapItemIdList) {
@@ -753,7 +673,8 @@ public class MapItemServiceImpl implements IMapItemService {
                 return;
             }
             // String path = mapItem.getRootPath() + mapItem.getImageUrl().getOriginalUrl();
-            String path = mapItem.getImageUrl().getOriginalUrl();
+            String loadPath = genericService.getLoadPath(mapItem.getServer());
+            String path = loadPath + mapItem.getImageUrl().getOriginalUrl();
             File file = new File(path);
             fileList.add(file);
         }
@@ -782,11 +703,18 @@ public class MapItemServiceImpl implements IMapItemService {
             //     errorMsg += " thumbnail";
             // if(!FileUtils.deleteDirectory(mapItem.getRootPath() + imageUrl.getTilesDir()))
             //     errorMsg += " tiles";
+            String loadPath = genericService.getLoadPath(mapItem.getServer());
+            if (mapItem.getThumbnailStatus() == StatusEnum.Finished){
+                // if(!FileUtils.deleteFile(resourcePath + mapItem.getResourceDir() + imageUrl.getThumbnailUrl()))
+                if(!FileUtils.deleteFile(loadPath + imageUrl.getThumbnailUrl()))
+                    errorMsg += " thumbnail";
+            }
+            if (mapItem.getTileStatus() == StatusEnum.Finished){
+                // if(!FileUtils.deleteDirectory(resourcePath + mapItem.getResourceDir() + imageUrl.getTilesDir()))
+                if(!FileUtils.deleteDirectory(loadPath + imageUrl.getTilesDir()))
+                    errorMsg += " tiles";
+            }
 
-            if(!FileUtils.deleteFile(resourcePath + mapItem.getResourceDir() + imageUrl.getThumbnailUrl()))
-                errorMsg += " thumbnail";
-            if(!FileUtils.deleteDirectory(resourcePath + mapItem.getResourceDir() + imageUrl.getTilesDir()))
-                errorMsg += " tiles";
 
             if (!errorMsg.equals("error:")){
                 return ResultUtils.error(errorMsg);
@@ -828,87 +756,16 @@ public class MapItemServiceImpl implements IMapItemService {
         mapItem.setMetadata(mapItemUpdateDTO.getMetadata());
 
         // 更新完元数据之后要重新计算地理坐标
-        mapItem = setItemGeo(mapItem,mapItem.getMapCLS());
+        mapItem = genericService.setItemGeo(mapItem,mapItem.getMapCLSId());
+
+        if (genericService.hasProcessFinish(mapItem)){
+            mapItem.setHasNeedManual(false);
+        }
 
         mapItemDao.save(mapItem);
 
         return ResultUtils.success();
     }
 
-
-    /**
-     * 匹配元数据
-     * @param mapItem 地图类
-     * @param mapCLS 地图分类
-     * @param excelPath excel路径
-     * @return java.util.Map<java.lang.String,java.lang.Object>
-     * @Author bin
-     **/
-    private MapItem matchMetadata(MapItem mapItem, MapClassification mapCLS, String excelPath){
-
-        Map<String, Object> metadataByName = null;
-        try {
-            metadataByName = metadataService.getMetadataByFilenameByType(mapItem.getName(), mapCLS, excelPath);
-        }catch (Exception e){
-            mapItem.setHasMatchMetaData(false);
-            return mapItem;
-        }
-        if (metadataByName == null){
-            mapItem.setHasMatchMetaData(false);
-            // mapItem.setHasNeedManual(true);
-        }else {
-            mapItem.setMetadata(metadataByName);
-            mapItem.setHasMatchMetaData(true);
-        }
-
-        return mapItem;
-
-    }
-
-
-    // 设置条目的地理坐标(center,box)
-    private MapItem setItemGeo(MapItem mapItem, MapClassification mapCLS){
-
-        // 废弃
-        // String fileName = mapItem.getName();
-
-        GeoInfo coordinate;
-
-        try {
-            String fileName = (String) mapItem.getMetadata().get("档号");
-            coordinate = geoInfoService.getCoordinate(fileName, mapCLS);
-        }catch (Exception e){
-            coordinate = null;
-        }
-
-        if (coordinate != null){
-            mapItem.setCenter(coordinate.getCenter());
-            mapItem.setPolygon(coordinate.getPolygon());
-            mapItem.setHasCalcCoordinate(true);
-            // mapItem.setHasNeedManual(false);
-        } else {
-            mapItem.setHasCalcCoordinate(false);
-            // mapItem.setHasNeedManual(true);
-        }
-
-        return mapItem;
-    }
-
-
-    //生成缩略图
-    private void generateThumbnailImage(MapItem mapItem, String inputPath, String outputDir){
-
-        asyncService.generateThumbnailImage(mapItem.getId(),inputPath,outputDir);
-
-
-    }
-
-
-    //切片处理
-    private void generateTiles(MapItem mapItem, String inputPath, String outputDir){
-
-        asyncService.generateTiles(mapItem.getId(),inputPath,outputDir);
-
-    }
 
 }
