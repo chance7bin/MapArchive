@@ -1,5 +1,8 @@
 package com.opengms.maparchivebackendprj.service;
 
+import com.opengms.maparchivebackendprj.entity.dto.mapItem.BatchProcessDTO;
+import com.opengms.maparchivebackendprj.entity.dto.mapItem.ProcessDTO;
+import com.opengms.maparchivebackendprj.entity.po.FileInfo;
 import com.opengms.maparchivebackendprj.entity.po.MapItem;
 
 /**
@@ -16,26 +19,22 @@ public interface IAsyncService {
     //所以要在修改该对象的时候用id查到该属性去修改
 
     /**
-     * 生成缩略图
-     * @param mapItemId 地图Id
-     * @param inputPath 输入文件路径
-     * @param outputDir 输出文件夹路径
+     * 地图条目入库
+     * @param mapItem 地图条目
+     * @param loadPath 加载的文件路径
+     * @param savePath 生成新文件保存的路径
+     * @param rootPath 在多级目录的情况下，以该路径作为根路径进行切分，按照该路径后面的格式生成对应的文件夹
+     * @param processDTO 批量处理所传入的参数
+     * @param fileInfo 与地图条目关联的文件信息(上传的功能才关联)
      * @return void
      * @Author bin
      **/
-    void generateThumbnailImage(String mapItemId, String inputPath, String outputDir);
+    void initMapItem(
+        MapItem mapItem,
+        String loadPath, String savePath, String rootPath,
+        ProcessDTO processDTO, FileInfo fileInfo);
 
-    /**
-     * 切片
-     * @param mapItemId 地图Id
-     * @param inputPath 输入文件路径
-     * @param outputDir 输出文件夹路径
-     * @return void
-     * @Author bin
-     **/
-    void generateTiles(String mapItemId, String inputPath, String outputDir);
-
-    //判断该条目是否处理完成
-    boolean hasProcessFinish(MapItem mapItem);
+    //批量处理
+    void batchProcess(MapItem mapItem, BatchProcessDTO processDTO);
 
 }

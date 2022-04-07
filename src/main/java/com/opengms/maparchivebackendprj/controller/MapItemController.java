@@ -2,6 +2,7 @@ package com.opengms.maparchivebackendprj.controller;
 
 import com.opengms.maparchivebackendprj.annotation.UserLoginToken;
 import com.opengms.maparchivebackendprj.entity.bo.JsonResult;
+import com.opengms.maparchivebackendprj.entity.bo.config.DataServer;
 import com.opengms.maparchivebackendprj.entity.dto.FindDTO;
 import com.opengms.maparchivebackendprj.entity.dto.SpecificFindDTO;
 import com.opengms.maparchivebackendprj.entity.dto.mapItem.*;
@@ -9,6 +10,7 @@ import com.opengms.maparchivebackendprj.entity.enums.MapClassification;
 import com.opengms.maparchivebackendprj.entity.enums.OperateTypeEnum;
 import com.opengms.maparchivebackendprj.entity.enums.StatusEnum;
 import com.opengms.maparchivebackendprj.entity.po.MapItemCLS;
+import com.opengms.maparchivebackendprj.entity.po.MetadataTable;
 import com.opengms.maparchivebackendprj.entity.po.User;
 import com.opengms.maparchivebackendprj.service.*;
 import com.opengms.maparchivebackendprj.utils.ResultUtils;
@@ -17,8 +19,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.repository.query.Param;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
@@ -39,6 +44,7 @@ public class MapItemController {
     @Autowired
     IUserService userService;
 
+
     @Autowired
     IMapItemService mapItemService;
 
@@ -50,6 +56,12 @@ public class MapItemController {
 
     @Autowired
     IMapItemCLSService mapItemCLSService;
+
+    @Autowired
+    IMetadataTableService metadataTableService;
+
+    @Resource(name="defaultDataServer")
+    DataServer defaultDataServer;
 
     @UserLoginToken
     @ApiOperation(value = "根据指定的物理地址对照片进行压缩和切片(包括地图类型和元数据)", notes = "@UserLoginToken")
@@ -69,12 +81,17 @@ public class MapItemController {
         }
 
         String mapCLSId = processDTO.getMapCLSId();
-        MapItemCLS mapCLS = mapItemCLSService.findById(mapCLSId);
+        MetadataTable mapCLS = metadataTableService.findById(mapCLSId);
         if (mapCLS == null){
             return ResultUtils.error("mapItem CLS 输入错误");
         }
-        if (mapCLS.getNameEn() == null){
-            return ResultUtils.error("mapItem CLS 要传入最后一级的clsid");
+
+        try {
+            String loadPath = processDTO.getProcessingPath();
+            loadPath = loadPath.replace("\\", "/");
+            String flag = loadPath.split(defaultDataServer.getLoadPath())[1];
+        }catch (Exception e){
+            return ResultUtils.error("批处理的资源所在路径需在dataServer.xml配置文件中第一个server的loadPath下");
         }
 
 
@@ -96,12 +113,9 @@ public class MapItemController {
         }
 
         String mapCLSId = mapItemAddDTO.getMapCLSId();
-        MapItemCLS mapCLS = mapItemCLSService.findById(mapCLSId);
+        MetadataTable mapCLS = metadataTableService.findById(mapCLSId);
         if (mapCLS == null){
             return ResultUtils.error("mapItem CLS 输入错误");
-        }
-        if (mapCLS.getNameEn() == null){
-            return ResultUtils.error("mapItem CLS 要传入最后一级的clsid");
         }
         // return mapItemService.insert(mapItemAddDTO, user.getName());
 
@@ -309,10 +323,11 @@ public class MapItemController {
 
     @UserLoginToken
     @ApiOperation(value = "批量删除文件 传过来的条目id列表" , notes = "@UserLoginToken")
-    @GetMapping("/delete/batch")
-    public JsonResult deleteBatchItem(@RequestBody List<String> mapItemIdList,HttpServletRequest request){
+    @PostMapping("/delete/batch")
+    public JsonResult deleteBatchItem(@RequestBody List<String> mapItemIdList, HttpServletRequest request){
 
         User user = userService.getUserByToken(request);
+        // List<String> list = Arrays.asList(mapItemIdList);
         logService.insertLogInfo(user.getName(),mapItemIdList, OperateTypeEnum.DELETE);
         return mapItemService.deleteBatchItem(mapItemIdList);
     }
@@ -330,8 +345,8 @@ public class MapItemController {
 
     @UserLoginToken
     @ApiOperation(value = "批量下载条目 传过来条目id列表", notes = "@UserLoginToken" )
-    @GetMapping("/download/batch")
-    public void downloadBatchItem(@RequestParam(value = "mapItemIdList") List<String> mapItemIdList,HttpServletRequest request,HttpServletResponse response){
+    @PostMapping("/download/batch")
+    public void downloadBatchItem(@RequestBody List<String> mapItemIdList,HttpServletRequest request,HttpServletResponse response){
         User user = userService.getUserByToken(request);
         logService.insertLogInfo(user.getName(),mapItemIdList, OperateTypeEnum.DOWNLOAD);
         mapItemService.downloadBatchItem(mapItemIdList,response);

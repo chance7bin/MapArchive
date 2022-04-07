@@ -28,7 +28,7 @@ public interface IUserService {
 
     JsonResult getUserRoleUser(FindDTO findDTO);
 
-    JsonResult updateRole(User user);
+    JsonResult updateRole(String userId, UserRoleEnum role);
 
     JsonResult deleteUser(String userId);
 }

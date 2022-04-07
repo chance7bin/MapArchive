@@ -2,9 +2,12 @@ package com.opengms.maparchivebackendprj.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.opengms.maparchivebackendprj.dao.IFileInfoDao;
+import com.opengms.maparchivebackendprj.dao.IMetadataTableDao;
 import com.opengms.maparchivebackendprj.entity.bo.JsonResult;
+import com.opengms.maparchivebackendprj.entity.bo.config.DataServer;
 import com.opengms.maparchivebackendprj.entity.dto.Chunk;
 import com.opengms.maparchivebackendprj.entity.po.FileInfo;
+import com.opengms.maparchivebackendprj.entity.po.MetadataTable;
 import com.opengms.maparchivebackendprj.service.IFileTransferService;
 import com.opengms.maparchivebackendprj.utils.FileUtils;
 import com.opengms.maparchivebackendprj.utils.ResultUtils;
@@ -13,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
@@ -36,8 +40,14 @@ public class FileTransferServiceImpl implements IFileTransferService {
     @Value("${resourcePath}")
     private String resourcePath;
 
+    @Resource(name="defaultDataServer")
+    DataServer defaultDataServer;
+
     @Autowired
     IFileInfoDao fileInfoDao;
+
+    @Autowired
+    IMetadataTableDao metadataTableDao;
 
     @Override
     public JsonResult uploadBigFile(Chunk chunk, HttpServletResponse response) {
@@ -70,12 +80,16 @@ public class FileTransferServiceImpl implements IFileTransferService {
         //判断是否是压缩包
         boolean isZip = fileType.equals("zip");
 
+        MetadataTable metadataTable = metadataTableDao.findById(chunk.getMapCLSId());
+
         //文件上传路径
         // String fileDir = mapItemDir + "/file";
-        String fileDir = "/" + chunk.getMapCLS().getNameEn() + "/file";
+        String fileDir = "/" + metadataTable.getCollection() + "/file";
         //压缩包上传路径
-        String zipDir = mapItemDir + "/uploadZip";
-        String uploadPath = isZip ? (resourcePath + zipDir) : (resourcePath + fileDir);
+        // String zipDir = mapItemDir + "/uploadZip";
+        String zipDir = "/uploadZip";
+        // String uploadPath = isZip ? (resourcePath + zipDir) : (resourcePath + fileDir);
+        String uploadPath = isZip ? (defaultDataServer.getLoadPath() + mapItemDir + zipDir) : (defaultDataServer.getLoadPath() + mapItemDir + fileDir);
 
         // String localFileName = chunk.getIdentifier() + "_" + chunk.getFilename();
         String localFileName = fileName;
@@ -133,7 +147,7 @@ public class FileTransferServiceImpl implements IFileTransferService {
             List<FileInfo> dto = new ArrayList<>();
             if (isZip){
                 // 压缩包解压的路径
-                String uncompressDir = resourcePath + fileDir + "/" + file.getName().substring(0,file.getName().lastIndexOf("."));
+                String uncompressDir = defaultDataServer.getLoadPath() + mapItemDir + fileDir + "/" + file.getName().substring(0,file.getName().lastIndexOf("."));
                 try {
                     fileList = FileUtils.zipUncompress(uploadPath + "/" + localFileName, uncompressDir);
                 }catch (Exception e){

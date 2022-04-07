@@ -11,6 +11,8 @@ spring:
 #    url: jdbc:sqlite:E:/mapArchiveFiles/demo.mbtiles
 
 resourcePath: E:/mapArchiveFiles
+#dataServerPath: Z:/
+#resourcePath: Z:/mapArchiveFiles
 
 #logging:
 #  config: classpath:logging-config.xml

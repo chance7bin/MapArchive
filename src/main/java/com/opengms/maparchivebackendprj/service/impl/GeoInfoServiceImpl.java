@@ -1,10 +1,13 @@
 package com.opengms.maparchivebackendprj.service.impl;
 
+import com.opengms.maparchivebackendprj.dao.IMetadataTableDao;
 import com.opengms.maparchivebackendprj.entity.bo.mapItem.GeoInfo;
 import com.opengms.maparchivebackendprj.entity.bo.mapItem.ScaleCoordinate;
 import com.opengms.maparchivebackendprj.entity.enums.MapClassification;
+import com.opengms.maparchivebackendprj.entity.po.MetadataTable;
 import com.opengms.maparchivebackendprj.service.IGeoInfoService;
 import com.sun.javafx.scene.transform.TransformUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.Point;
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint;
 import org.springframework.data.mongodb.core.geo.GeoJsonPolygon;
@@ -12,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.Collections;
+
+import static com.opengms.maparchivebackendprj.entity.enums.MapClassification.BASIC_SCALE_MAP_TEN;
 
 /**
  * @Description 地理坐标计算
@@ -21,8 +26,11 @@ import java.util.Collections;
 @Service
 public class GeoInfoServiceImpl implements IGeoInfoService {
 
+    @Autowired
+    IMetadataTableDao metadataTableDao;
+
     @Override
-    public GeoInfo getCoordinate(String filename, MapClassification mapCLS) {
+    public GeoInfo getCoordinate(String filename, String mapCLSId) {
         GeoInfo coordinate = null;
 
         // 得到文件名（去掉后缀）
@@ -33,36 +41,39 @@ public class GeoInfoServiceImpl implements IGeoInfoService {
             return null;
         }
 
-        switch (mapCLS){
-            case BASIC_SCALE_MAP_TEN:{
+        MetadataTable metadataTable = metadataTableDao.findById(mapCLSId);
+        String collection = metadataTable.getCollection();
+
+        switch (collection){
+            case "BASIC_SCALE_MAP_TEN":{
                 coordinate = getCoordinate10w(filename);
                 break;
             }
-            case BASIC_SCALE_MAP_ONE:{
+            case "BASIC_SCALE_MAP_ONE":{
                 coordinate = getCoordinate1w(filename);
                 break;
             }
-            case BASIC_SCALE_MAP_TWO_DOT_FIVE:{
+            case "BASIC_SCALE_MAP_TWO_DOT_FIVE":{
                 coordinate = getCoordinate2Dot5w(filename);
                 break;
             }
-            case BASIC_SCALE_MAP_FIVE:{
+            case "BASIC_SCALE_MAP_FIVE":{
                 coordinate = getCoordinate5w(filename);
                 break;
             }
-            case BASIC_SCALE_MAP_TWENTY:{
+            case "BASIC_SCALE_MAP_TWENTY":{
                 coordinate = getCoordinate20w(filename);
                 break;
             }
-            case BASIC_SCALE_MAP_TWENTY_FIVE:{
+            case "BASIC_SCALE_MAP_TWENTY_FIVE":{
                 coordinate = getCoordinate25w(filename);
                 break;
             }
-            case BASIC_SCALE_MAP_FIFTY:{
+            case "BASIC_SCALE_MAP_FIFTY":{
                 coordinate = getCoordinate50w(filename);
                 break;
             }
-            case BASIC_SCALE_MAP_HUNDRED:{
+            case "BASIC_SCALE_MAP_HUNDRED":{
                 coordinate = getCoordinate100w(filename);
                 break;
             }

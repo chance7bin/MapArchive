@@ -51,7 +51,8 @@ public class Chunk implements Serializable {
      */
     private MultipartFile file;
 
-    private MapClassification mapCLS;
+    // private MapClassification mapCLS;
+    private String mapCLSId;
 
 
 

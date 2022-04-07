@@ -1,19 +1,27 @@
 package com.opengms.maparchivebackendprj.service.impl;
 
 import com.opengms.maparchivebackendprj.dao.IMapItemDao;
+import com.opengms.maparchivebackendprj.entity.bo.config.DataServer;
+import com.opengms.maparchivebackendprj.entity.bo.mapItem.ProcessParam;
+import com.opengms.maparchivebackendprj.entity.dto.mapItem.BatchProcessDTO;
+import com.opengms.maparchivebackendprj.entity.dto.mapItem.ProcessDTO;
 import com.opengms.maparchivebackendprj.entity.enums.StatusEnum;
+import com.opengms.maparchivebackendprj.entity.po.FileInfo;
 import com.opengms.maparchivebackendprj.entity.po.MapItem;
 import com.opengms.maparchivebackendprj.service.IAsyncService;
+import com.opengms.maparchivebackendprj.service.IGenericService;
 import com.opengms.maparchivebackendprj.service.IMapItemService;
 import com.opengms.maparchivebackendprj.utils.FileUtils;
 import com.opengms.maparchivebackendprj.utils.ImageUtils;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.io.File;
 
 /**
@@ -31,109 +39,147 @@ public class AsyncServiceImpl implements IAsyncService {
     @Value("${resourcePath}")
     private String resourcePath;
 
+    @Resource(name="defaultDataServer")
+    DataServer defaultDataServer;
+
+    @Autowired
+    IGenericService genericService;
+
 
     @Async
     @Override
-    public void generateThumbnailImage(String mapItemId, String inputPath, String outputDir) {
+    public void initMapItem(
+        MapItem mapItem, String loadPath,
+        String savePath, String rootPath,
+        ProcessDTO processDTO, FileInfo fileInfo) {
 
-        MapItem mapItem = mapItemDao.findById(mapItemId);
+
+        // MapItem mapItem = new MapItem();
         mapItem.setProcessStatus(StatusEnum.Started);
-        mapItem.setThumbnailStatus(StatusEnum.Started);
-        mapItemDao.save(mapItem);
 
-        // ImageUtils.thumbnailImage(inputPath, outputDir, 200, 200,"thumb_",false);
-        File inputFile = new File(inputPath);
-        try {
-            // Thumbnails.of(inputFile)
-            //     .size(200, 200)
-            //     .toFile(outputDir + "/thumb_" + inputFile.getName());
-            String filename = FileUtils.getFilenameNoSuffix(inputFile);
-            //先创建目录
-            File output = new File(outputDir);
-            if (!output.exists()) {
-                output.mkdirs();
-            }
-            String outputPath = outputDir + "/thumb_" + filename + ".png";
-            log.info("start generate thumbnail, path:{}",outputPath);
-            //生成缩略图(输出路径的父文件必须存在)
-            Thumbnails.of(inputPath)
-                .size(200, 200)
-                .toFile(outputPath);
-
-            // 执行完耗时方法要再请求一次数据库，防止该条目的信息不是最新的
-            mapItem = mapItemDao.findById(mapItem.getId());
-
-        }catch (Exception e){
-            log.error(String.valueOf(e));
-            mapItem.setThumbnailStatus(StatusEnum.Error);
-            mapItem.setProcessStatus(StatusEnum.Error);
-            mapItemDao.save(mapItem);
-            return;
+        //文件与地图条目进行关联
+        if(fileInfo != null){
+            mapItem.setRelativeFileId(fileInfo.getId());
         }
 
-        mapItem.setThumbnailStatus(StatusEnum.Finished);
+
+        if (processDTO.isMatchMetadata()){
+            mapItem = genericService.matchMetadata(mapItem,mapItem.getMapCLSId(),processDTO.getMetadataExcelPath());
+
+        }
+
+        if (processDTO.isCalcGeoInfo()){
+            mapItem = genericService.setItemGeo(mapItem, mapItem.getMapCLSId());
+        }
+
+
+        String type = FileUtils.getFileType(mapItem.getName());
+        // 执行脚本的文件后缀必须为 .jpg 或者是 .png  或者是.tif .tiff
+        if (type.equals("jpg") || type.equals("png")
+            || type.equals("tif") || type.equals("tiff")
+            || type.equals("TIF") || type.equals("TIFF")){
+
+            //加载的文件路径
+            // String filePath = loadPath;
+            //新文件保存路径
+            String thumbnailPath = "/" + "thumbnail";
+            String tilesPath = "/" + "tiles";
+            //对多级目录的处理
+            String[] path = FileUtils.buildMultiDirPath(loadPath, rootPath, thumbnailPath, tilesPath);
+
+            File loadFile = new File(loadPath);
+
+            // 得到图片的元数据
+            try {
+                // TODO: 2022/3/16 正常图片的宽度应该大于高度，如果不是这样的话可能图片需要做旋转的处理
+                mapItem.setImageMetadata(ImageUtils.getImageInfo(loadPath));
+            } catch (Exception e){
+                mapItem.setImageMetadata(null);
+            }
+
+            path[1] += "/" + FileUtils.getFilenameNoSuffix(loadFile);
+
+            // 异步处理地图
+            if (processDTO.isGenerateThumbnail()){
+                mapItem = genericService.generateThumbnailImage(mapItem,loadPath,savePath + path[0]);
+            }
+
+            if (processDTO.isGenerateTiles()){
+                mapItem = genericService.generateTiles(mapItem,loadPath,savePath + path[1]);
+            }
+
+            // 如果既没有生成缩略图也没有切片，那处理的状态设置为Finished
+            mapItem.setProcessStatus(StatusEnum.Finished);
+
+            if (genericService.hasProcessFinish(mapItem)){
+                mapItem.setHasNeedManual(false);
+            }
+
+
+            // 设置生成的图片路径
+            // mapItem中存的都是相对路径，定位文件位置用rootPath定位
+//            String originalUrl = fileInfo.getPath().replace("\\", "/");
+//            savePath = savePath.replace("\\", "/");
+//             mapItem.getImageUrl().setOriginalUrl(loadPath);
+            loadPath = loadPath.replace("\\", "/");
+            mapItem.getImageUrl().setOriginalUrl(loadPath.split(defaultDataServer.getLoadPath())[1]);
+            String filename = FileUtils.getFilenameNoSuffix(loadFile);
+            filename = "thumb_" + filename + ".png";
+            mapItem.getImageUrl().setThumbnailUrl((savePath + path[0] + "/" + filename).split(defaultDataServer.getLoadPath())[1]);
+            mapItem.getImageUrl().setTilesDir((savePath + path[1]).split(defaultDataServer.getLoadPath())[1]);
+            // mapItem.setRootPath(savePath);
+            // mapItem.setResourceDir(savePath.split(resourcePath)[1]);
+            // mapItem.setResourceDir(savePath.split(defaultDataServer.getLoadPath())[1]);
+            mapItem.setServer(defaultDataServer.getName());
+            mapItem.setProcessParam(
+                new ProcessParam(
+                    mapItem.getId(),
+                    loadPath.split(defaultDataServer.getLoadPath())[1],
+                    (savePath + path[0]).split(defaultDataServer.getLoadPath())[1],
+                    (savePath + path[1]).split(defaultDataServer.getLoadPath())[1]
+                )
+            );
+        }
+
+
+        mapItemDao.save(mapItem);
+
+
+    }
+
+    @Async
+    @Override
+    public void batchProcess(MapItem mapItem, BatchProcessDTO processDTO) {
+
+        ProcessParam param = mapItem.getProcessParam();
+
+        String loadPath = genericService.getLoadPath(mapItem.getServer());
+
+        mapItem.setProcessStatus(StatusEnum.Started);
+
+        if (processDTO.isMatchMetadata() && !mapItem.isHasMatchMetaData()){
+            mapItem = genericService.matchMetadata(mapItem, mapItem.getMapCLSId(), null);
+        }
+
+        if (processDTO.isCalcGeoInfo() && !mapItem.isHasCalcCoordinate()){
+            mapItem = genericService.setItemGeo(mapItem,mapItem.getMapCLSId());
+        }
+
+        if (processDTO.isGenerateThumbnail() && (mapItem.getThumbnailStatus() != StatusEnum.Finished)){
+            mapItem = genericService.generateThumbnailImage(mapItem,loadPath + param.getInputPath(),loadPath + param.getThumbnailOutputDir());
+        }
+
+        if (processDTO.isGenerateTiles() && (mapItem.getTileStatus() != StatusEnum.Finished)){
+            mapItem = genericService.generateTiles(mapItem,loadPath + param.getInputPath(),loadPath + param.getTilesOutputDir());
+        }
+
         mapItem.setProcessStatus(StatusEnum.Finished);
 
-        if (hasProcessFinish(mapItem)){
+        if (genericService.hasProcessFinish(mapItem)){
             mapItem.setHasNeedManual(false);
         }
 
         mapItemDao.save(mapItem);
-
-    }
-
-    @Async
-    @Override
-    public void generateTiles(String mapItemId, String inputPath, String outputDir) {
-
-        MapItem mapItem = mapItemDao.findById(mapItemId);
-        mapItem.setProcessStatus(StatusEnum.Started);
-        //更新数据库中的切片状态
-        mapItem.setTileStatus(StatusEnum.Started);
-        mapItemDao.save(mapItem);
-
-        //存储瓦片
-        long l = ImageUtils.image2Tiles(inputPath, outputDir, resourcePath);
-
-        // 执行完耗时方法要再请求一次数据库，防止该条目的信息不是最新的
-        mapItem = mapItemDao.findById(mapItem.getId());
-
-        // 如果输出文件夹不存在或者执行的时间小于1s的话就说明切片有问题
-        File file = new File(outputDir);
-        // if ((!file.exists() && !file.isDirectory()) || l < 1){
-        if (!file.exists() && !file.isDirectory()){
-            mapItem.setTileStatus(StatusEnum.Error);
-            mapItem.setProcessStatus(StatusEnum.Error);
-        } else {
-            mapItem.setTileStatus(StatusEnum.Finished);
-            mapItem.setProcessStatus(StatusEnum.Finished);
-        }
-
-        if (hasProcessFinish(mapItem)){
-            mapItem.setHasNeedManual(false);
-        }
-
-        mapItemDao.save(mapItem);
-
-    }
-
-    @Override
-    public boolean hasProcessFinish(MapItem mapItem){
-
-        StatusEnum processStatus = mapItem.getProcessStatus();
-        StatusEnum thumbnailStatus = mapItem.getThumbnailStatus();
-        StatusEnum tileStatus = mapItem.getTileStatus();
-        boolean hasMatchMetaData = mapItem.isHasMatchMetaData();
-        boolean hasCalcCoordinate = mapItem.isHasCalcCoordinate();
-
-        if(processStatus == StatusEnum.Finished &&
-            thumbnailStatus == StatusEnum.Finished &&
-            tileStatus == StatusEnum.Finished &&
-            hasMatchMetaData && hasCalcCoordinate){
-            return true;
-        }
-
-        return false;
 
     }
 }

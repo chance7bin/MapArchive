@@ -26,42 +26,44 @@ public interface IMapItemDao {
 
     List<MapItem> findBySearchTextAndPolygonAndPageable(
         String curQueryField, String searchText,
-        GeoJsonPolygon polygon, List<MapClassification> clsIdList, Pageable pageable);
+        GeoJsonPolygon polygon, List<String> clsIdList, Pageable pageable);
 
     List<MapItem> findBySearchTextAndPolygonAndPageable(
         String curQueryField, String searchText,
-        Box box, List<MapClassification> clsIdList, Pageable pageable);
+        Box box, List<String> clsIdList, Pageable pageable);
 
     List<MapItem> findBySearchTextAndPolygonAndPageable(
         String curQueryField, String searchText,
-        GeoJsonMultiPolygon polygon, List<MapClassification> clsIdList, Pageable pageable);
+        GeoJsonMultiPolygon polygon, List<String> clsIdList, Pageable pageable);
 
     long countBySearchTextAndPolygon(
         String curQueryField, String searchText,
-        GeoJsonPolygon polygon, List<MapClassification> clsIdList);
+        GeoJsonPolygon polygon, List<String> clsIdList);
 
     long countBySearchTextAndPolygon(
         String curQueryField, String searchText,
-        GeoJsonMultiPolygon polygon, List<MapClassification> clsIdList);
+        GeoJsonMultiPolygon polygon, List<String> clsIdList);
 
-    List<MapItem> findBySearchTextAndPageable(String curQueryField, String searchText, List<MapClassification> clsIdList, Pageable pageable);
+    List<MapItem> findBySearchTextAndPageable(String curQueryField, String searchText, List<String> clsIdList, Pageable pageable);
 
 
-    long countBySearchText(String curQueryField, String searchText,List<MapClassification> clsIdList);
+    long countBySearchText(String curQueryField, String searchText,List<String> clsIdList);
 
     //根据处理状态查
-    List<MapItem> findBySearchTextAndStatus(String curQueryField, String searchText,List<StatusEnum> statusEnums, List<MapClassification> clsIdList, Pageable pageable);
+    List<MapItem> findBySearchTextAndStatus(String curQueryField, String searchText,List<StatusEnum> statusEnums, List<String> clsIdList, Pageable pageable);
 
     List<MapItem> findByStatus(List<StatusEnum> statusEnums,Pageable pageable);
     List<MapItem> findByStatus(List<StatusEnum> statusEnums);
 
-    List<MapItem> findByStatusAndHasNeedManual(String curQueryField, String searchText,List<StatusEnum> statusEnums, boolean hasNeedManual, List<MapClassification> clsIdList, Pageable pageable);
+    List<MapItem> findByStatusAndHasNeedManual(List<StatusEnum> statusEnums,boolean hasNeedManual,Pageable pageable);
 
-    List<MapItem> findByHasNeedManual(String curQueryField, String searchText,boolean hasNeedManual, List<MapClassification> clsIdList, Pageable pageable);
+    List<MapItem> findByStatusAndHasNeedManual(String curQueryField, String searchText,List<StatusEnum> statusEnums, boolean hasNeedManual, List<String> clsIdList, Pageable pageable);
 
-    long countByStatus(String curQueryField, String searchText,List<StatusEnum> statusEnums, List<MapClassification> clsIdList);
+    List<MapItem> findByHasNeedManual(String curQueryField, String searchText,boolean hasNeedManual, List<String> clsIdList, Pageable pageable);
 
-    long countByStatusAndHasNeedManual(String curQueryField, String searchText,List<StatusEnum> statusEnums, boolean hasNeedManual, List<MapClassification> clsIdList);
+    long countByStatus(String curQueryField, String searchText,List<StatusEnum> statusEnums, List<String> clsIdList);
+
+    long countByStatusAndHasNeedManual(String curQueryField, String searchText,List<StatusEnum> statusEnums, boolean hasNeedManual, List<String> clsIdList);
 
     List<MapItem> findAll(Pageable pageable);
 

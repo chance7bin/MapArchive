@@ -22,7 +22,7 @@ import java.util.List;
  * @Author bin
  * @Date 2022/03/24
  */
-@Repository
+@Repository("mapItemDaoImpl")
 public class MapItemDaoImpl implements IMapItemDao {
 
     @Autowired
@@ -47,14 +47,14 @@ public class MapItemDaoImpl implements IMapItemDao {
     @Override
     public List<MapItem> findBySearchTextAndPolygonAndPageable(
         String curQueryField, String searchText,
-        GeoJsonPolygon polygon, List<MapClassification> clsIdList, Pageable pageable) {
+        GeoJsonPolygon polygon, List<String> clsIdList, Pageable pageable) {
 
         Query query = new Query();
         // query.addCriteria(Criteria.where("box").within(box));
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         query.addCriteria(Criteria.where("polygon").intersects(polygon));
         if (clsIdList.size() != 0)
-            query.addCriteria(Criteria.where("mapCLS").in(clsIdList));
+            query.addCriteria(Criteria.where("mapCLSId").in(clsIdList));
 
         return mongoTemplate.find(query.with(pageable), MapItem.class);
     }
@@ -62,13 +62,13 @@ public class MapItemDaoImpl implements IMapItemDao {
     @Override
     public List<MapItem> findBySearchTextAndPolygonAndPageable(
         String curQueryField, String searchText,
-        Box box, List<MapClassification> clsIdList, Pageable pageable) {
+        Box box, List<String> clsIdList, Pageable pageable) {
 
         Query query = new Query();
         query.addCriteria(Criteria.where("box").within(box));
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         if (clsIdList.size() != 0)
-            query.addCriteria(Criteria.where("mapCLS").in(clsIdList));
+            query.addCriteria(Criteria.where("mapCLSId").in(clsIdList));
 
         return mongoTemplate.find(query.with(pageable), MapItem.class);
     }
@@ -76,13 +76,13 @@ public class MapItemDaoImpl implements IMapItemDao {
     @Override
     public List<MapItem> findBySearchTextAndPolygonAndPageable(
         String curQueryField, String searchText,
-        GeoJsonMultiPolygon polygon, List<MapClassification> clsIdList, Pageable pageable) {
+        GeoJsonMultiPolygon polygon, List<String> clsIdList, Pageable pageable) {
         Query query = new Query();
         // query.addCriteria(Criteria.where("box").within(box));
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         query.addCriteria(Criteria.where("polygon").intersects(polygon));
         if (clsIdList.size() != 0)
-            query.addCriteria(Criteria.where("mapCLS").in(clsIdList));
+            query.addCriteria(Criteria.where("mapCLSId").in(clsIdList));
         List<MapItem> mapItemList = mongoTemplate.find(query.with(pageable), MapItem.class);
         return mapItemList;
     }
@@ -90,34 +90,34 @@ public class MapItemDaoImpl implements IMapItemDao {
     @Override
     public long countBySearchTextAndPolygon(
         String curQueryField, String searchText,
-        GeoJsonPolygon polygon, List<MapClassification> clsIdList) {
+        GeoJsonPolygon polygon, List<String> clsIdList) {
         Query query = new Query();
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         query.addCriteria(Criteria.where("polygon").intersects(polygon));
         if (clsIdList.size() != 0)
-            query.addCriteria(Criteria.where("mapCLS").in(clsIdList));
+            query.addCriteria(Criteria.where("mapCLSId").in(clsIdList));
         return mongoTemplate.count(query,MapItem.class);
     }
 
     @Override
     public long countBySearchTextAndPolygon(
         String curQueryField, String searchText,
-        GeoJsonMultiPolygon polygon, List<MapClassification> clsIdList) {
+        GeoJsonMultiPolygon polygon, List<String> clsIdList) {
         Query query = new Query();
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         query.addCriteria(Criteria.where("polygon").intersects(polygon));
         if (clsIdList.size() != 0)
-            query.addCriteria(Criteria.where("mapCLS").in(clsIdList));
+            query.addCriteria(Criteria.where("mapCLSId").in(clsIdList));
         return mongoTemplate.count(query,MapItem.class);
     }
 
     @Override
-    public List<MapItem> findBySearchTextAndPageable(String curQueryField, String searchText, List<MapClassification> clsIdList, Pageable pageable) {
+    public List<MapItem> findBySearchTextAndPageable(String curQueryField, String searchText, List<String> clsIdList, Pageable pageable) {
 
         Query query = new Query();
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         if (clsIdList.size() != 0)
-            query.addCriteria(Criteria.where("mapCLS").in(clsIdList));
+            query.addCriteria(Criteria.where("mapCLSId").in(clsIdList));
 
         return mongoTemplate.find(query.with(pageable), MapItem.class);
 
@@ -125,24 +125,24 @@ public class MapItemDaoImpl implements IMapItemDao {
     }
 
     @Override
-    public long countBySearchText(String curQueryField, String searchText, List<MapClassification> clsIdList) {
+    public long countBySearchText(String curQueryField, String searchText, List<String> clsIdList) {
 
         Query query = new Query();
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         if (clsIdList.size() != 0)
-            query.addCriteria(Criteria.where("mapCLS").in(clsIdList));
+            query.addCriteria(Criteria.where("mapCLSId").in(clsIdList));
         return mongoTemplate.count(query,MapItem.class);
 
 
     }
 
     @Override
-    public List<MapItem> findBySearchTextAndStatus(String curQueryField, String searchText, List<StatusEnum> statusEnums, List<MapClassification> clsIdList, Pageable pageable) {
+    public List<MapItem> findBySearchTextAndStatus(String curQueryField, String searchText, List<StatusEnum> statusEnums, List<String> clsIdList, Pageable pageable) {
         Query query = new Query();
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         query.addCriteria(Criteria.where("processStatus").in(statusEnums));
         if (clsIdList.size() != 0)
-            query.addCriteria(Criteria.where("mapCLS").in(clsIdList));
+            query.addCriteria(Criteria.where("mapCLSId").in(clsIdList));
         return mongoTemplate.find(query.with(pageable), MapItem.class);
     }
 
@@ -162,9 +162,19 @@ public class MapItemDaoImpl implements IMapItemDao {
     }
 
     @Override
+    public List<MapItem> findByStatusAndHasNeedManual(List<StatusEnum> statusEnums, boolean hasNeedManual, Pageable pageable) {
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("processStatus").in(statusEnums));
+        query.addCriteria(Criteria.where("hasNeedManual").is(hasNeedManual));
+        return mongoTemplate.find(query, MapItem.class);
+
+    }
+
+    @Override
     public List<MapItem> findByStatusAndHasNeedManual(
         String curQueryField, String searchText,
-        List<StatusEnum> statusEnums, boolean hasNeedManual, List<MapClassification> clsIdList,Pageable pageable) {
+        List<StatusEnum> statusEnums, boolean hasNeedManual, List<String> clsIdList,Pageable pageable) {
 
 
         Query query = new Query();
@@ -172,7 +182,7 @@ public class MapItemDaoImpl implements IMapItemDao {
         query.addCriteria(Criteria.where("hasNeedManual").is(hasNeedManual));
         query.addCriteria(Criteria.where("processStatus").in(statusEnums));
         if (clsIdList.size() != 0)
-            query.addCriteria(Criteria.where("mapCLS").in(clsIdList));
+            query.addCriteria(Criteria.where("mapCLSId").in(clsIdList));
         return mongoTemplate.find(query.with(pageable), MapItem.class);
 
     }
@@ -180,38 +190,38 @@ public class MapItemDaoImpl implements IMapItemDao {
     @Override
     public List<MapItem> findByHasNeedManual(
         String curQueryField, String searchText,
-        boolean hasNeedManual, List<MapClassification> clsIdList, Pageable pageable) {
+        boolean hasNeedManual, List<String> clsIdList, Pageable pageable) {
 
         Query query = new Query();
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         query.addCriteria(Criteria.where("hasNeedManual").is(hasNeedManual));
         if (clsIdList.size() != 0)
-            query.addCriteria(Criteria.where("mapCLS").in(clsIdList));
+            query.addCriteria(Criteria.where("mapCLSId").in(clsIdList));
         return mongoTemplate.find(query.with(pageable), MapItem.class);
     }
 
     @Override
     public long countByStatus(
         String curQueryField, String searchText,
-        List<StatusEnum> statusEnums,  List<MapClassification> clsIdList) {
+        List<StatusEnum> statusEnums,  List<String> clsIdList) {
         Query query = new Query();
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         query.addCriteria(Criteria.where("processStatus").in(statusEnums));
         if (clsIdList.size() != 0)
-            query.addCriteria(Criteria.where("mapCLS").in(clsIdList));
+            query.addCriteria(Criteria.where("mapCLSId").in(clsIdList));
         return mongoTemplate.count(query,MapItem.class);
     }
 
     @Override
     public long countByStatusAndHasNeedManual(
         String curQueryField, String searchText,
-        List<StatusEnum> statusEnums, boolean hasNeedManual, List<MapClassification> clsIdList) {
+        List<StatusEnum> statusEnums, boolean hasNeedManual, List<String> clsIdList) {
         Query query = new Query();
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         query.addCriteria(Criteria.where("hasNeedManual").is(hasNeedManual));
         query.addCriteria(Criteria.where("processStatus").in(statusEnums));
         if (clsIdList.size() != 0)
-            query.addCriteria(Criteria.where("mapCLS").in(clsIdList));
+            query.addCriteria(Criteria.where("mapCLSId").in(clsIdList));
         return mongoTemplate.count(query,MapItem.class);
     }
 
