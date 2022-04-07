@@ -6,9 +6,11 @@ import com.opengms.maparchivebackendprj.entity.dto.ExcelPathDTO;
 import com.opengms.maparchivebackendprj.entity.dto.SpecificFindDTO;
 import com.opengms.maparchivebackendprj.entity.enums.MapClassification;
 import com.opengms.maparchivebackendprj.entity.po.MapItemCLS;
+import com.opengms.maparchivebackendprj.entity.po.MetadataTable;
 import com.opengms.maparchivebackendprj.service.IGenericService;
 import com.opengms.maparchivebackendprj.service.IMapItemCLSService;
 import com.opengms.maparchivebackendprj.service.IMetadataService;
+import com.opengms.maparchivebackendprj.service.IMetadataTableService;
 import com.opengms.maparchivebackendprj.utils.FileUtils;
 import com.opengms.maparchivebackendprj.utils.ResultUtils;
 import io.swagger.annotations.Api;
@@ -39,6 +41,9 @@ public class MetadataController {
     @Autowired
     IMapItemCLSService mapItemCLSService;
 
+    @Autowired
+    IMetadataTableService metadataTableService;
+
     @ApiOperation(value = "查询元数据表 findDTO里要指定searchText是根据什么字段查找的[curQueryField必填]" )
     @RequestMapping(value = "/list/database", method = RequestMethod.POST)
     public JsonResult getMetadata(@RequestBody SpecificFindDTO findDTO){
@@ -55,14 +60,13 @@ public class MetadataController {
             return ResultUtils.error("请传入mapItemCLSId");
         }
 
-        MapItemCLS cls = mapItemCLSService.findById(findDTO.getMapCLSId());
-        if (cls == null || cls.getNameEn() == null || cls.getNameEn().equals("")){
+        MetadataTable cls = metadataTableService.findById(findDTO.getMapCLSId());
+        if (cls == null){
             return ResultUtils.error("未找到对应的元数据表，请输入正确的clsId");
         }
-        MapClassification mapCLS = MapClassification.getMapCLSByNameEn(cls.getNameEn());
 
 
-        return metadataService.getMetadata(findDTO,mapCLS);
+        return metadataService.getMetadata(findDTO,cls.getCollection());
 
 
     }

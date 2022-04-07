@@ -17,6 +17,7 @@ public class MapItemAddDTO {
 
     List<FileInfo> fileInfoList; //上传的文件改成这个字段
     // MapClassification mapCLS; //地图类型
+    @ApiModelProperty(value = "地图目录树对应的id", example = "87086982-5ab1-473e-a65c-c010958f3ef3")
     String mapCLSId; //地图分类
 
     @ApiModelProperty(value = "元数据Excel路径(可选,未填该参数则默认到数据库查)", example = "D:/mapArchiveFiles/DEMO.xls")

@@ -155,13 +155,13 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public JsonResult updateRole(User user) {
+    public JsonResult updateRole(String userId, UserRoleEnum role) {
 
-        User oldUser = userDao.findById(user.getId());
-        if(oldUser == null){
+        User user = userDao.findById(userId);
+        if(user == null){
             return ResultUtils.error("未找到该用户");
         }
-
+        user.setUserRole(role);
         userDao.save(user);
 
 

@@ -2,11 +2,15 @@ package com.opengms.maparchivebackendprj.controller;
 
 import com.opengms.maparchivebackendprj.entity.bo.JsonResult;
 import com.opengms.maparchivebackendprj.entity.dto.Chunk;
+import com.opengms.maparchivebackendprj.entity.po.MetadataTable;
 import com.opengms.maparchivebackendprj.service.IFileTransferService;
+import com.opengms.maparchivebackendprj.service.IMetadataTableService;
+import com.opengms.maparchivebackendprj.utils.ResultUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,8 +30,12 @@ import javax.servlet.http.HttpServletResponse;
 public class FileTransferController {
 
 
+
     @Autowired
     IFileTransferService fileTransferService;
+
+    @Autowired
+    IMetadataTableService metadataTableService;
 
     /**
      * 处理文件上传POST请求
@@ -42,6 +50,13 @@ public class FileTransferController {
         @ModelAttribute Chunk chunk,
         HttpServletResponse response
     ){
+
+        String mapCLSId = chunk.getMapCLSId();
+        MetadataTable mapCLS = metadataTableService.findById(mapCLSId);
+        if (mapCLS == null){
+            return ResultUtils.error("mapItem CLS 输入错误");
+        }
+
         return fileTransferService.uploadBigFile(chunk,response);
     }
 

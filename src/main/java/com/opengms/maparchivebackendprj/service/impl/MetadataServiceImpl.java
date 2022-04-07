@@ -2,10 +2,12 @@ package com.opengms.maparchivebackendprj.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.opengms.maparchivebackendprj.dao.IMetadataDao;
+import com.opengms.maparchivebackendprj.dao.IMetadataTableDao;
 import com.opengms.maparchivebackendprj.entity.bo.JsonResult;
 import com.opengms.maparchivebackendprj.entity.bo.PageableResult;
 import com.opengms.maparchivebackendprj.entity.dto.ExcelPathDTO;
 import com.opengms.maparchivebackendprj.entity.dto.SpecificFindDTO;
+import com.opengms.maparchivebackendprj.entity.po.MetadataTable;
 import com.opengms.maparchivebackendprj.service.IGenericService;
 import com.opengms.maparchivebackendprj.service.IMetadataService;
 import com.opengms.maparchivebackendprj.entity.enums.MapClassification;
@@ -20,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static com.opengms.maparchivebackendprj.entity.enums.MapClassification.BASIC_SCALE_MAP_TEN;
 
 /**
  * @Description
@@ -36,19 +40,23 @@ public class MetadataServiceImpl implements IMetadataService {
     @Autowired
     IGenericService genericService;
 
+    @Autowired
+    IMetadataTableDao metadataTableDao;
+
 
     @Override
-    public Map<String, Object> getMetadataByFilenameByType(String filename, MapClassification mapCLS, String excelPath) {
-        switch (mapCLS){
-            case BASIC_SCALE_MAP_TEN:{
-                return getBSMMetadata10w(filename,mapCLS,excelPath);
+    public Map<String, Object> getMetadataByFilenameByType(String filename, String mapCLSId, String excelPath) {
+        MetadataTable metadataTable = metadataTableDao.findById(mapCLSId);
+        String collection = metadataTable.getCollection();
+        switch (collection){
+            case "BASIC_SCALE_MAP_TEN":{
+                return getBSMMetadata10w(filename,collection,excelPath);
             }
             default:{
                 // GeoInfo coordinate10w = null;
                 return null;
             }
         }
-
     }
 
     @Override
@@ -64,13 +72,13 @@ public class MetadataServiceImpl implements IMetadataService {
     }
 
     @Override
-    public JsonResult getMetadata(SpecificFindDTO findDTO, MapClassification mapCLS) {
+    public JsonResult getMetadata(SpecificFindDTO findDTO, String collection) {
 
         Pageable pageable = genericService.getPageable(findDTO);
 
-        List<JSONObject> metadataList = metadataDao.findMetadataBySearchText(findDTO.getCurQueryField(),findDTO.getSearchText(),mapCLS,pageable);
+        List<JSONObject> metadataList = metadataDao.findMetadataBySearchText(findDTO.getCurQueryField(),findDTO.getSearchText(),collection,pageable);
 
-        long count = metadataDao.countMetadataBySearchText(findDTO.getCurQueryField(),findDTO.getSearchText(),mapCLS);
+        long count = metadataDao.countMetadataBySearchText(findDTO.getCurQueryField(),findDTO.getSearchText(),collection);
 
         return ResultUtils.success(new PageableResult<>(count,metadataList));
     }
@@ -123,7 +131,7 @@ public class MetadataServiceImpl implements IMetadataService {
     }
 
     // 基础比例尺地图下的元数据匹配（1：10w）
-    private Map<String, Object> getBSMMetadata10w(String filename, MapClassification mapCLS, String excelPath)  {
+    private Map<String, Object> getBSMMetadata10w(String filename, String collection, String excelPath)  {
 
 
         // 基本比例尺 （原图幅编号 or 原图幅编号+年份）
@@ -260,11 +268,11 @@ public class MetadataServiceImpl implements IMetadataService {
         } else {
 
             // 先匹配 原图幅编号+年份 这一列
-            List<JSONObject> list = metadataDao.findMetadataByOriginalNumAndYear(formatFilename ,mapCLS);
+            List<JSONObject> list = metadataDao.findMetadataByOriginalNumAndYear(formatFilename ,collection);
             if (list.size() == 1)
                 return list.get(0);
             // 再匹配 原图幅编号这一列
-            List<JSONObject> list1 = metadataDao.findMetadataByOriginalNum(formatFilename ,mapCLS);
+            List<JSONObject> list1 = metadataDao.findMetadataByOriginalNum(formatFilename ,collection);
             if (list1.size() == 1)
                 return list1.get(0);
 

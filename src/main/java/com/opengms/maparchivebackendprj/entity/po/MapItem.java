@@ -21,8 +21,8 @@ import java.util.Map;
 @Document
 @Data
 public class MapItem extends GenericItem {
-    // TODO: 2022/3/28 这个到底要不要新建一个表来专门保存mapCLS
-    MapClassification mapCLS;
+    // MapClassification mapCLS;
+    String mapCLSId; //对应MetadataTable中的id
 
     ImageUrl imageUrl = new ImageUrl();  //图片存放的相对路径
     String relativeFileId; //该地图关联的文件id,用于下载以及删除关联文件
@@ -53,5 +53,6 @@ public class MapItem extends GenericItem {
 
     ImageMetadata imageMetadata; //图片的元数据信息
 
+    String server; //服务器别名，用于标识资源存储的服务器位置，详细信息在/config/dataServer.xml中
 
 }

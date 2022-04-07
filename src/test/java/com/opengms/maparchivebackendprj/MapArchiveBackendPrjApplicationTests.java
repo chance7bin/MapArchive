@@ -1,24 +1,43 @@
 package com.opengms.maparchivebackendprj;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.opengms.maparchivebackendprj.dao.IClassificationTreeDao;
+import com.opengms.maparchivebackendprj.dao.IMetadataTableDao;
 import com.opengms.maparchivebackendprj.dao.IMapItemCLSDao;
+import com.opengms.maparchivebackendprj.entity.bo.config.DataServer;
+import com.opengms.maparchivebackendprj.entity.bo.config.DataServerList;
 import com.opengms.maparchivebackendprj.entity.enums.MapClassification;
+import com.opengms.maparchivebackendprj.entity.po.ClassificationTree;
+import com.opengms.maparchivebackendprj.entity.po.MetadataTable;
 import com.opengms.maparchivebackendprj.entity.po.MapItemCLS;
+import com.opengms.maparchivebackendprj.service.IMapItemService;
+import com.opengms.maparchivebackendprj.utils.FileUtils;
+import com.opengms.maparchivebackendprj.utils.XmlUtils;
+import org.apache.poi.ss.formula.functions.T;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.Element;
+import org.dom4j.io.SAXReader;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.mongodb.core.MongoTemplate;
+import org.yaml.snakeyaml.Yaml;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import javax.annotation.Resource;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 @SpringBootTest
 class MapArchiveBackendPrjApplicationTests {
 
     @Autowired
     IMapItemCLSDao mapItemCLSDao;
+    private Object DataServerList;
 
     @Test
     void contextLoads() {
@@ -152,6 +171,159 @@ class MapArchiveBackendPrjApplicationTests {
 
     }
 
+    @Value("${resourcePath}")
+    private String resourcePath;
 
+    @Test
+    void loadXml(){
+        SAXReader reader = new SAXReader();
+        try {
+            Document read = reader.read(resourcePath + "/config/dataServer.xml");
+            // 获取根节点
+            Element root = read.getRootElement();
+            // 通过elementIterator方法获取迭代器
+            Iterator books = root.elementIterator();
+            // 遍历迭代器
+            while(books.hasNext()) {
+                System.out.println("------------开始遍历------------");
+                Element b = (Element)books.next();
+                // 获取每本书的属性
+                List<Attribute> bookList = b.attributes();
+                for(Attribute a:bookList) {
+                    System.out.println(a.getName() + ":" + a.getValue());
+                }
+                // 获取每本书下面的子节点
+                Iterator childBook = b.elementIterator();
+                while(childBook.hasNext()) {
+                    Element c = (Element)childBook.next();
+                    System.out.println(c.getName() + ":" + c.getStringValue());
+                }
+                System.out.println("-------------遍历完成------------");
+            }
+        } catch (DocumentException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    void loadXml1() throws Exception {
+        // 读取XML文件
+        BufferedReader br = new BufferedReader(new FileReader(resourcePath + "/config/dataServer.xml"));
+        StringBuffer buffer = new StringBuffer();
+        String line = "";
+        while ((line = br.readLine()) !=null) {
+            buffer.append(line);
+        }
+        br.close();
+        // XML转为Java对象
+        DataServerList dataServerList = (DataServerList) XmlUtils.xmlStrToObject(DataServerList.class, buffer.toString());
+        // List<DataServer> dataServerList = (List<DataServer>) XmlUtils.xmlStrToObject(DataServer.class, buffer.toString());
+        // return dataServerList.get();
+        System.out.println();
+
+    }
+
+    T xml2Object(T t) throws Exception{
+        // 读取XML文件
+        BufferedReader br = new BufferedReader(new FileReader(resourcePath + "/config/dataServer.xml"));
+        StringBuffer buffer = new StringBuffer();
+        String line = "";
+        while ((line = br.readLine()) !=null) {
+            buffer.append(line);
+        }
+        br.close();
+        // XML转为Java对象
+        T dataServerList = (T) XmlUtils.xmlStrToObject(T.class, buffer.toString());
+        // List<DataServer> dataServerList = (List<DataServer>) XmlUtils.xmlStrToObject(DataServer.class, buffer.toString());
+        // return dataServerList.get();
+        System.out.println();
+        return dataServerList;
+    }
+
+    @Resource(name="defaultDataServer")
+    DataServer defaultDataServer;
+
+    @Test
+    void testProp(){
+        System.out.println(defaultDataServer);
+        System.out.println();
+    }
+
+    @Test
+    void readProperties() throws IOException {
+        Yaml yml = new Yaml();
+        FileReader reader = new FileReader("src/main/resources/application.yml");
+        BufferedReader buffer = new BufferedReader(reader);
+        Map<String,Object> map = yml.load(buffer);
+        // System.out.println(map.get("key1"));
+        // System.out.println(map.get("key2"));
+        buffer.close();
+        reader.close();
+    }
+
+    @Autowired
+    IMetadataTableDao metadataTableDao;
+
+    @Test
+    void loadJson(){
+
+        String path = resourcePath + "/config/collectionList.json";
+        String s = FileUtils.readJsonFile(path);
+        JSONArray collectionArr = JSON.parseArray(s);
+        System.out.println();
+        for (int i = 0; i < collectionArr.size(); i++) {
+            JSONObject collection = collectionArr.getJSONObject(i);
+            MetadataTable c = new MetadataTable();
+            c.setName(collection.getString("name"));
+            c.setCollection(collection.getString("collection"));
+            if (metadataTableDao.findByCollection(c.getCollection()) == null){
+                metadataTableDao.insert(c);
+            }
+        }
+
+    }
+
+    @Test
+    void writeJson() throws IOException {
+        String path = resourcePath + "/config/collectionList.json";
+        String s = FileUtils.readJsonFile(path);
+        JSONArray collectionArr = JSON.parseArray(s);
+        for (int i = 0; i < collectionArr.size(); i++) {
+            JSONObject collection = collectionArr.getJSONObject(i);
+            if (collection.getString("id").equals("")){
+                MetadataTable c = metadataTableDao.findByCollection(collection.getString("collection"));
+                collection.put("id",c.getId());
+            }
+        }
+
+        OutputStreamWriter osw = new OutputStreamWriter(new FileOutputStream(path), StandardCharsets.UTF_8);
+        osw.write(collectionArr.toString());
+        osw.flush();//清空缓冲区，强制输出数据
+        osw.close();//关闭输出流
+    }
+
+    @Autowired
+    IClassificationTreeDao classificationTreeDao;
+
+    @Test
+    void loadTree(){
+        String path = resourcePath + "/config/classificationTree.json";
+        String s = FileUtils.readJsonFile(path);
+        JSONArray jsonArray = JSON.parseArray(s);
+        System.out.println();
+        ClassificationTree classificationTree = new ClassificationTree();
+        classificationTree.setVersion("basic");
+        classificationTree.setTree(jsonArray);
+        classificationTreeDao.insert(classificationTree);
+    }
+
+    @Autowired
+    IMapItemService mapItemService;
+
+    @Test
+    void buildClassifications(){
+        List<String> list = mapItemService.buildClassifications("6e61e393-5765-4788-b43d-99d0252591d4");
+        System.out.println();
+    }
 
 }

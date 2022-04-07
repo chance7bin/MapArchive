@@ -8,6 +8,7 @@ import com.opengms.maparchivebackendprj.entity.enums.MapClassification;
 import com.opengms.maparchivebackendprj.entity.enums.StatusEnum;
 import com.opengms.maparchivebackendprj.entity.po.MapItem;
 import com.opengms.maparchivebackendprj.entity.po.MapItemCLS;
+import com.opengms.maparchivebackendprj.entity.po.MetadataTable;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -19,10 +20,10 @@ import java.util.List;
  */
 public interface IMapItemService {
 
-    void process(ProcessDTO processDTO, String username, MapItemCLS mapItemCLS);
+    void process(ProcessDTO processDTO, String username, MetadataTable mapItemCLS);
 
 
-    void insert(MapItemAddDTO mapItemAddDTO, String username, MapItemCLS mapItemCLS);
+    void insert(MapItemAddDTO mapItemAddDTO, String username, MetadataTable mapItemCLS);
 
     JsonResult findItemById(String id);
 
@@ -64,4 +65,7 @@ public interface IMapItemService {
     JsonResult deleteBatchItem(List<String> mapItemIdList);
 
     JsonResult updateItem(String id, MapItemUpdateDTO mapItemUpdateDTO);
+
+    List<String> buildClassifications(String clsId);
+
 }

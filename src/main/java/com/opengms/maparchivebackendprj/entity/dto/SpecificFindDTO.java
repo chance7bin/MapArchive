@@ -15,7 +15,7 @@ import java.util.Map;
 public class SpecificFindDTO extends FindDTO{
     @ApiModelProperty(value = "查询内容", example = "")
     private String searchText = ""; //查询内容
-    @ApiModelProperty(value = "地图目录树对应的id 不传入的话默认查询所有分类", example = "f8665a7f-e66e-4cf0-9ef2-845f6ac3eb7f")
+    @ApiModelProperty(value = "地图目录树对应的id 不传入的话默认查询所有分类", example = "87086982-5ab1-473e-a65c-c010958f3ef3")
     private String mapCLSId; //地图分类
     @ApiModelProperty(value = "按属性查询", example = "name")
     private String curQueryField; //属性分类

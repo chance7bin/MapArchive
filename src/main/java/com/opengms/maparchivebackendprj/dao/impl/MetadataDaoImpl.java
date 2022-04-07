@@ -27,34 +27,62 @@ public class MetadataDaoImpl implements IMetadataDao {
     MongoTemplate mongoTemplate;
 
 
+    // @Override
+    // public List<JSONObject> findMetadataByOriginalNum(String filename, MapClassification mapCLS) {
+    //     Query query = new Query();
+    //     query.addCriteria(Criteria.where("原图幅编号").is(filename));
+    //     return mongoTemplate.find(query, JSONObject.class, mapCLS.getNameEn());
+    //
+    // }
+    //
+    // @Override
+    // public List<JSONObject> findMetadataByOriginalNumAndYear(String filename, MapClassification mapCLS) {
+    //     Query query = new Query();
+    //     query.addCriteria(Criteria.where("numAndYear").is(filename));
+    //     return mongoTemplate.find(query, JSONObject.class, mapCLS.getNameEn());
+    //
+    // }
+    //
+    // @Override
+    // public List<JSONObject> findMetadataBySearchText(String curQueryField, String searchText, MapClassification mapCLS, Pageable pageable) {
+    //     Query query = new Query();
+    //     query.addCriteria(Criteria.where(curQueryField).regex(searchText));
+    //     return mongoTemplate.find(query, JSONObject.class, mapCLS.getNameEn());
+    // }
+    //
+    // @Override
+    // public long countMetadataBySearchText(String curQueryField, String searchText, MapClassification mapCLS) {
+    //     Query query = new Query();
+    //     query.addCriteria(Criteria.where(curQueryField).regex(searchText));
+    //     return mongoTemplate.count(query, JSONObject.class, mapCLS.getNameEn());
+    // }
+
     @Override
-    public List<JSONObject> findMetadataByOriginalNum(String filename, MapClassification mapCLS) {
+    public List<JSONObject> findMetadataByOriginalNum(String filename, String collection) {
         Query query = new Query();
         query.addCriteria(Criteria.where("原图幅编号").is(filename));
-        return mongoTemplate.find(query, JSONObject.class, mapCLS.getNameEn());
-
+        return mongoTemplate.find(query, JSONObject.class, collection);
     }
 
     @Override
-    public List<JSONObject> findMetadataByOriginalNumAndYear(String filename, MapClassification mapCLS) {
+    public List<JSONObject> findMetadataByOriginalNumAndYear(String filename, String collection) {
         Query query = new Query();
         query.addCriteria(Criteria.where("numAndYear").is(filename));
-        return mongoTemplate.find(query, JSONObject.class, mapCLS.getNameEn());
-
+        return mongoTemplate.find(query, JSONObject.class, collection);
     }
 
     @Override
-    public List<JSONObject> findMetadataBySearchText(String curQueryField, String searchText, MapClassification mapCLS, Pageable pageable) {
+    public List<JSONObject> findMetadataBySearchText(String curQueryField, String searchText, String collection, Pageable pageable) {
         Query query = new Query();
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
-        return mongoTemplate.find(query, JSONObject.class, mapCLS.getNameEn());
+        return mongoTemplate.find(query, JSONObject.class, collection);
     }
 
     @Override
-    public long countMetadataBySearchText(String curQueryField, String searchText, MapClassification mapCLS) {
+    public long countMetadataBySearchText(String curQueryField, String searchText, String collection) {
         Query query = new Query();
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
-        return mongoTemplate.count(query, JSONObject.class, mapCLS.getNameEn());
+        return mongoTemplate.count(query, JSONObject.class, collection);
     }
 
 

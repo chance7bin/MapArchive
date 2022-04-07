@@ -6,6 +6,7 @@ import com.opengms.maparchivebackendprj.entity.bo.JsonResult;
 import com.opengms.maparchivebackendprj.entity.dto.FindDTO;
 import com.opengms.maparchivebackendprj.entity.dto.User.UserLoginDTO;
 import com.opengms.maparchivebackendprj.entity.dto.User.UserRegisterDTO;
+import com.opengms.maparchivebackendprj.entity.enums.UserRoleEnum;
 import com.opengms.maparchivebackendprj.entity.po.User;
 import com.opengms.maparchivebackendprj.service.IGenericService;
 import com.opengms.maparchivebackendprj.service.IUserService;
@@ -72,10 +73,10 @@ public class UserController {
 
     @SuperLoginToken
     @ApiOperation(value = "超级管理员修改用户权限", notes = "@SuperLoginToken")
-    @RequestMapping(value="/role/update",method = RequestMethod.POST)
-    public JsonResult updateRole(@RequestBody User user){
+    @RequestMapping(value="/update/{userId}/{role}",method = RequestMethod.GET)
+    public JsonResult updateRole(@PathVariable String userId, @PathVariable UserRoleEnum role){
 
-        return userService.updateRole(user);
+        return userService.updateRole(userId,role);
     }
 
 

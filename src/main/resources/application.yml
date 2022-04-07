@@ -1,16 +1,20 @@
 spring:
   profiles:
-    active: dev
+    active: win
   mvc:
     static-path-pattern: /static/**
     pathmatch:
       matching-strategy: ANT_PATH_MATCHER
-  http:
-    multipart:
-      locations: ${resourcePath}
+#  http:
+#    multipart:
+#      locations: ${resourcePath}
+#  web:
+#    resources:
+#      static-locations: classpath:/META-INF/resources/,classpath:/resources/, classpath:/static/, classpath:/public/, file:${spring.http.multipart.locations}
   web:
     resources:
-      static-locations: classpath:/META-INF/resources/,classpath:/resources/, classpath:/static/, classpath:/public/, file:${spring.http.multipart.locations}
+      static-locations: classpath:/META-INF/resources/,classpath:/resources/, classpath:/static/, classpath:/public/
+
   servlet:
     multipart:
       enabled: true #默认支持文件上传
@@ -25,4 +29,6 @@ server:
     uri-encoding: utf-8
 
 mapItemDir: /repository
+
+#dataServer: server2
 
