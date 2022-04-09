@@ -8,6 +8,7 @@ import com.opengms.maparchivebackendprj.dao.IMapItemCLSDao;
 import com.opengms.maparchivebackendprj.dao.IMetadataTableDao;
 import com.opengms.maparchivebackendprj.entity.bo.GenericId;
 import com.opengms.maparchivebackendprj.entity.bo.JsonResult;
+import com.opengms.maparchivebackendprj.entity.bo.config.DataServer;
 import com.opengms.maparchivebackendprj.entity.dto.ClassificationTreeDTO;
 import com.opengms.maparchivebackendprj.entity.po.ClassificationTree;
 import com.opengms.maparchivebackendprj.entity.po.MetadataTable;
@@ -20,10 +21,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
  * @Description
@@ -47,6 +50,9 @@ public class ToolsController {
 
     @Autowired
     IClassificationTreeDao classificationTreeDao;
+
+    @Resource(name = "dataServerList")
+    List<DataServer> dataServerList;
 
     // @ApiOperation(value = "第一步，生成与数据库对应的表的目录" )
     // @RequestMapping(value = "/baseCLSMapDB", method = RequestMethod.GET)
@@ -391,5 +397,14 @@ public class ToolsController {
         GenericId genericId = new GenericId();
         return ResultUtils.success(genericId.getId());
     }
+
+
+    @ApiOperation(value = "得到 /config/dataServer.xml的服务器信息" )
+    @RequestMapping(value = "/dataServer", method = RequestMethod.GET)
+    public JsonResult getDataServer(){
+        // GenericId genericId = new GenericId();
+        return ResultUtils.success(dataServerList);
+    }
+
 
 }

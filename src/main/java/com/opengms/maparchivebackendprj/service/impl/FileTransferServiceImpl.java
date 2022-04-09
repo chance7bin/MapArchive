@@ -9,6 +9,7 @@ import com.opengms.maparchivebackendprj.entity.dto.Chunk;
 import com.opengms.maparchivebackendprj.entity.po.FileInfo;
 import com.opengms.maparchivebackendprj.entity.po.MetadataTable;
 import com.opengms.maparchivebackendprj.service.IFileTransferService;
+import com.opengms.maparchivebackendprj.service.IGenericService;
 import com.opengms.maparchivebackendprj.utils.FileUtils;
 import com.opengms.maparchivebackendprj.utils.ResultUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +50,9 @@ public class FileTransferServiceImpl implements IFileTransferService {
     @Autowired
     IMetadataTableDao metadataTableDao;
 
+    @Autowired
+    IGenericService genericService;
+
     @Override
     public JsonResult uploadBigFile(Chunk chunk, HttpServletResponse response) {
 
@@ -72,6 +76,12 @@ public class FileTransferServiceImpl implements IFileTransferService {
          */
 
 
+        if (chunk.getServername() == null || chunk.getServername().equals("")){
+            return ResultUtils.error("未找到指定数据服务器");
+        }
+        String loadPath = genericService.getLoadPath(chunk.getServername());
+
+
         // 判断文件类型
         String fileName = chunk.getFilename();
         String[] split = fileName.split("\\.");
@@ -89,7 +99,7 @@ public class FileTransferServiceImpl implements IFileTransferService {
         // String zipDir = mapItemDir + "/uploadZip";
         String zipDir = "/uploadZip";
         // String uploadPath = isZip ? (resourcePath + zipDir) : (resourcePath + fileDir);
-        String uploadPath = isZip ? (defaultDataServer.getLoadPath() + mapItemDir + zipDir) : (defaultDataServer.getLoadPath() + mapItemDir + fileDir);
+        String uploadPath = isZip ? (loadPath + mapItemDir + zipDir) : (defaultDataServer.getLoadPath() + mapItemDir + fileDir);
 
         // String localFileName = chunk.getIdentifier() + "_" + chunk.getFilename();
         String localFileName = fileName;
@@ -147,7 +157,7 @@ public class FileTransferServiceImpl implements IFileTransferService {
             List<FileInfo> dto = new ArrayList<>();
             if (isZip){
                 // 压缩包解压的路径
-                String uncompressDir = defaultDataServer.getLoadPath() + mapItemDir + fileDir + "/" + file.getName().substring(0,file.getName().lastIndexOf("."));
+                String uncompressDir = loadPath + mapItemDir + fileDir + "/" + file.getName().substring(0,file.getName().lastIndexOf("."));
                 try {
                     fileList = FileUtils.zipUncompress(uploadPath + "/" + localFileName, uncompressDir);
                 }catch (Exception e){

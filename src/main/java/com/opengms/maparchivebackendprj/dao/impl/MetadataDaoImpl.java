@@ -75,7 +75,7 @@ public class MetadataDaoImpl implements IMetadataDao {
     public List<JSONObject> findMetadataBySearchText(String curQueryField, String searchText, String collection, Pageable pageable) {
         Query query = new Query();
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
-        return mongoTemplate.find(query, JSONObject.class, collection);
+        return mongoTemplate.find(query.with(pageable), JSONObject.class, collection);
     }
 
     @Override
