@@ -8,17 +8,8 @@ import com.opengms.maparchivebackendprj.dao.IMapItemCLSDao;
 import com.opengms.maparchivebackendprj.dao.IMetadataTableDao;
 import com.opengms.maparchivebackendprj.entity.bo.GenericId;
 import com.opengms.maparchivebackendprj.entity.bo.JsonResult;
-<<<<<<< HEAD
 import com.opengms.maparchivebackendprj.entity.bo.config.DataServer;
-<<<<<<< .mine
-=======
 import com.opengms.maparchivebackendprj.entity.dto.CheckDTO;
->>>>>>> wenfei
-=======
-import com.opengms.maparchivebackendprj.entity.dto.CheckDTO;
-
-
->>>>>>> .theirs
 import com.opengms.maparchivebackendprj.entity.dto.ClassificationTreeDTO;
 import com.opengms.maparchivebackendprj.entity.po.ClassificationTree;
 import com.opengms.maparchivebackendprj.entity.po.MetadataTable;
