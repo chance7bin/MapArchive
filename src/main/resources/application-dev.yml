@@ -4,8 +4,9 @@
 spring:
   data:
     mongodb:
-      uri: mongodb://172.21.213.33/MapArchiveDB
 #      uri: mongodb://127.0.0.1/MapArchive
+      uri: mongodb://localhost/MapArchiveDB
+
 #  datasource:
 #    driver-class-name: org.sqlite.JDBC
 #    url: jdbc:sqlite:E:/mapArchiveFiles/demo.mbtiles

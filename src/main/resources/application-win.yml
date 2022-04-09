@@ -7,7 +7,7 @@ spring:
 
 
 #resourcePath: /home/MapArchive/mapArchiveFiles
-resourcePath: D:/mapArchiveFiles
+resourcePath: E:/mapArchiveFiles
 
 logging:
   config: classpath:logging-config.xml
@@ -15,4 +15,4 @@ logging:
 #logback:
 #  LOG_HOME: /home/MapArchive/logs
 logback:
-  LOG_HOME: D:/mapArchiveFiles/logs
+  LOG_HOME: E:/mapArchiveFiles/logs
