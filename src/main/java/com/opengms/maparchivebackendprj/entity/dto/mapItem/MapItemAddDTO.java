@@ -31,4 +31,7 @@ public class MapItemAddDTO {
     boolean generateThumbnail;
     @ApiModelProperty(value = "是否进行切图")
     boolean generateTiles;
+
+    @ApiModelProperty(value = "资源读取服务器，servername对应dataServer.xml文件里<server>下面的<name>", example = "localhost")
+    String servername;
 }

@@ -70,6 +70,8 @@ public class MetadataServiceImpl implements IMetadataService {
 
         Pageable pageable = genericService.getPageable(findDTO);
 
+        // findDTO.setCurQueryField("档号");
+
         List<JSONObject> metadataList = metadataDao.findMetadataBySearchText(findDTO.getCurQueryField(),findDTO.getSearchText(),collection,pageable);
 
         long count = metadataDao.countMetadataBySearchText(findDTO.getCurQueryField(),findDTO.getSearchText(),collection);

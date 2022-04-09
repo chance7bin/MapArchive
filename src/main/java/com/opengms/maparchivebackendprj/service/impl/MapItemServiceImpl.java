@@ -54,8 +54,8 @@ public class MapItemServiceImpl implements IMapItemService {
     // @Value("${dataServerPath}")
     // private String dataServerPath;
 
-    @Resource(name="defaultDataServer")
-    DataServer defaultDataServer;
+    // @Resource(name="defaultDataServer")
+    // DataServer defaultDataServer;
 
     @Value("${mapItemDir}")
     private String mapItemDir;
@@ -101,7 +101,7 @@ public class MapItemServiceImpl implements IMapItemService {
         // 自动生成保存路径
         String cls = mapItemCLS.getCollection();
         // String savePath = resourcePath +  "/" + cls;
-        String savePath = defaultDataServer.getLoadPath() + mapItemDir +  "/" + cls;
+        String savePath = genericService.getLoadPath(processDTO.getServername()) + mapItemDir +  "/" + cls;
 
         // MapClassification mapCLSByNameEn = MapClassification.getMapCLSByNameEn(cls);
 
@@ -145,12 +145,12 @@ public class MapItemServiceImpl implements IMapItemService {
     @Override
     public void insert(MapItemAddDTO mapItemAddDTO, String username, MetadataTable mapItemCLS) {
 
-
+        String loadPath = genericService.getLoadPath(mapItemAddDTO.getServername());
 
         // String processingPath = resourcePath +  "/" + mapItemCLS.getNameEn() + "/file";
-        String processingPath = defaultDataServer.getLoadPath() + mapItemDir +  "/" + mapItemCLS.getCollection() + "/file";
+        String processingPath = loadPath + mapItemDir +  "/" + mapItemCLS.getCollection() + "/file";
         // String savePath = resourcePath +  "/" + mapItemCLS.getNameEn();
-        String savePath = defaultDataServer.getLoadPath() + mapItemDir +  "/" + mapItemCLS.getCollection();
+        String savePath = loadPath + mapItemDir +  "/" + mapItemCLS.getCollection();
 
 
         // String cls = mapItemCLS.getNameEn();
@@ -160,27 +160,30 @@ public class MapItemServiceImpl implements IMapItemService {
         // List<MapItem> mapItemList = new ArrayList<>();
         List<String> itemListId = new ArrayList<>();
         List<FileInfo> fileInfoList = mapItemAddDTO.getFileInfoList();
-        for (FileInfo fileInfo : fileInfoList) {
-            // MapItem mapItem = new MapItem();
-            MapItem mapItem = new MapItem();
-            mapItem.setAuthor(username);
-            mapItem.setName(fileInfo.getFileName());
-            mapItem.setMapCLSId(mapItemAddDTO.getMapCLSId());
-            mapItemDao.insert(mapItem);
+        if (fileInfoList != null){
+            for (FileInfo fileInfo : fileInfoList) {
+                // MapItem mapItem = new MapItem();
+                MapItem mapItem = new MapItem();
+                mapItem.setAuthor(username);
+                mapItem.setName(fileInfo.getFileName());
+                mapItem.setMapCLSId(mapItemAddDTO.getMapCLSId());
+                mapItemDao.insert(mapItem);
 
-            itemListId.add(mapItem.getId());
+                itemListId.add(mapItem.getId());
 
-            ProcessDTO processDTO = new ProcessDTO(
-                processingPath,
-                mapItemCLS.getId(),
-                mapItemAddDTO.getMetadataTable(),
-                mapItemAddDTO.isMatchMetadata(),
-                mapItemAddDTO.isCalcGeoInfo(),
-                mapItemAddDTO.isGenerateThumbnail(),
-                mapItemAddDTO.isGenerateTiles());
+                ProcessDTO processDTO = new ProcessDTO(
+                    processingPath,
+                    mapItemCLS.getId(),
+                    mapItemAddDTO.getMetadataTable(),
+                    mapItemAddDTO.isMatchMetadata(),
+                    mapItemAddDTO.isCalcGeoInfo(),
+                    mapItemAddDTO.isGenerateThumbnail(),
+                    mapItemAddDTO.isGenerateTiles(),
+                    mapItemAddDTO.getServername());
 
-            // mapItemList.add(initMapItem(mapItem,fileInfo.getPath(),savePath,processingPath, processDTO, fileInfo));
-            asyncService.initMapItem(mapItem,fileInfo.getPath(),savePath,processingPath, processDTO, fileInfo);
+                // mapItemList.add(initMapItem(mapItem,fileInfo.getPath(),savePath,processingPath, processDTO, fileInfo));
+                asyncService.initMapItem(mapItem,fileInfo.getPath(),savePath,processingPath, processDTO, fileInfo);
+            }
         }
 
         logDao.insert(new LogInfo(username,itemListId, OperateTypeEnum.UPLOAD,new Date()));
@@ -676,6 +679,10 @@ public class MapItemServiceImpl implements IMapItemService {
             String loadPath = genericService.getLoadPath(mapItem.getServer());
             String path = loadPath + mapItem.getImageUrl().getOriginalUrl();
             File file = new File(path);
+            if (!file.exists()){
+                log.warn("download a resource that does not exist");
+                return;
+            }
             fileList.add(file);
         }
         FileUtils.toZip(fileList, zipPath);
