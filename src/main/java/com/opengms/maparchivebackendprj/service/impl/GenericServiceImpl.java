@@ -94,10 +94,23 @@ public class GenericServiceImpl implements IGenericService {
             }
 
         }
-
+        // return null;
         return defaultDataServer.getLoadPath();
 
     }
+
+    @Override
+    public String getLoadPathReturnNull(String serverName) {
+        for (DataServer dataServer : dataServerList) {
+
+            if (dataServer.getName().equals(serverName)){
+                return dataServer.getLoadPath();
+            }
+
+        }
+        return null;
+    }
+
     @Override
     public MapItem matchMetadata(MapItem mapItem, String mapCLSId, String metadataExcelPath) {
         Map<String, Object> metadataByName = null;

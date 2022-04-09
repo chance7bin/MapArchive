@@ -54,6 +54,6 @@ public class Chunk implements Serializable {
     // private MapClassification mapCLS;
     private String mapCLSId;
 
-
+    private String servername;
 
 }

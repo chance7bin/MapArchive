@@ -27,6 +27,9 @@ public interface IGenericService {
     //根据传入的server name得到资源存储的路径
     String getLoadPath(String serverName);
 
+    //没找到的时候返回的是null
+    String getLoadPathReturnNull(String serverName);
+
     MapItem matchMetadata(MapItem mapItem, String mapCLSId, String metadataExcelPath);
 
     MapItem setItemGeo(MapItem mapItem, String mapCLSId);

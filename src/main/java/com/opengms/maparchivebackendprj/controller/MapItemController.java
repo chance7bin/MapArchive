@@ -60,8 +60,8 @@ public class MapItemController {
     @Autowired
     IMetadataTableService metadataTableService;
 
-    @Resource(name="defaultDataServer")
-    DataServer defaultDataServer;
+    // @Resource(name="defaultDataServer")
+    // DataServer defaultDataServer;
 
     @UserLoginToken
     @ApiOperation(value = "根据指定的物理地址对照片进行压缩和切片(包括地图类型和元数据)", notes = "@UserLoginToken")
@@ -86,13 +86,21 @@ public class MapItemController {
             return ResultUtils.error("mapItem CLS 输入错误");
         }
 
+
+        String serverLoadPath = genericService.getLoadPathReturnNull(processDTO.getServername());
+        if (serverLoadPath == null){
+            return ResultUtils.error("未找到指定数据服务器");
+        }
+
         try {
             String loadPath = processDTO.getProcessingPath();
             loadPath = loadPath.replace("\\", "/");
-            String flag = loadPath.split(defaultDataServer.getLoadPath())[1];
+            String flag = loadPath.split(serverLoadPath)[1];
         }catch (Exception e){
             return ResultUtils.error("批处理的资源所在路径需在dataServer.xml配置文件中第一个server的loadPath下");
         }
+
+
 
 
         mapItemService.process(processDTO,user.getName(),mapCLS);
@@ -112,12 +120,21 @@ public class MapItemController {
             return ResultUtils.error("用户验证失败");
         }
 
+        if (mapItemAddDTO.getFileInfoList() == null || mapItemAddDTO.getFileInfoList().size() == 0){
+            return ResultUtils.error("未上传文件");
+        }
+
         String mapCLSId = mapItemAddDTO.getMapCLSId();
         MetadataTable mapCLS = metadataTableService.findById(mapCLSId);
         if (mapCLS == null){
             return ResultUtils.error("mapItem CLS 输入错误");
         }
         // return mapItemService.insert(mapItemAddDTO, user.getName());
+
+        String serverLoadPath = genericService.getLoadPathReturnNull(mapItemAddDTO.getServername());
+        if (serverLoadPath == null){
+            return ResultUtils.error("未找到指定数据服务器");
+        }
 
         mapItemService.insert(mapItemAddDTO, user.getName(), mapCLS);
         return ResultUtils.success();

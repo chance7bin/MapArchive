@@ -14,7 +14,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 /**
- * @Description
+ * @Description 加载配置文件 /config/dataServer.xml 的服务器信息
  * @Author bin
  * @Date 2022/04/05
  */

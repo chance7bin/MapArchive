@@ -39,8 +39,8 @@ public class AsyncServiceImpl implements IAsyncService {
     @Value("${resourcePath}")
     private String resourcePath;
 
-    @Resource(name="defaultDataServer")
-    DataServer defaultDataServer;
+    // @Resource(name="defaultDataServer")
+    // DataServer defaultDataServer;
 
     @Autowired
     IGenericService genericService;
@@ -116,27 +116,29 @@ public class AsyncServiceImpl implements IAsyncService {
             }
 
 
+            String serverLoadPath = genericService.getLoadPath(processDTO.getServername());
+
             // 设置生成的图片路径
             // mapItem中存的都是相对路径，定位文件位置用rootPath定位
 //            String originalUrl = fileInfo.getPath().replace("\\", "/");
 //            savePath = savePath.replace("\\", "/");
 //             mapItem.getImageUrl().setOriginalUrl(loadPath);
             loadPath = loadPath.replace("\\", "/");
-            mapItem.getImageUrl().setOriginalUrl(loadPath.split(defaultDataServer.getLoadPath())[1]);
+            mapItem.getImageUrl().setOriginalUrl(loadPath.split(serverLoadPath)[1]);
             String filename = FileUtils.getFilenameNoSuffix(loadFile);
             filename = "thumb_" + filename + ".png";
-            mapItem.getImageUrl().setThumbnailUrl((savePath + path[0] + "/" + filename).split(defaultDataServer.getLoadPath())[1]);
-            mapItem.getImageUrl().setTilesDir((savePath + path[1]).split(defaultDataServer.getLoadPath())[1]);
+            mapItem.getImageUrl().setThumbnailUrl((savePath + path[0] + "/" + filename).split(serverLoadPath)[1]);
+            mapItem.getImageUrl().setTilesDir((savePath + path[1]).split(serverLoadPath)[1]);
             // mapItem.setRootPath(savePath);
             // mapItem.setResourceDir(savePath.split(resourcePath)[1]);
             // mapItem.setResourceDir(savePath.split(defaultDataServer.getLoadPath())[1]);
-            mapItem.setServer(defaultDataServer.getName());
+            mapItem.setServer(processDTO.getServername());
             mapItem.setProcessParam(
                 new ProcessParam(
                     mapItem.getId(),
-                    loadPath.split(defaultDataServer.getLoadPath())[1],
-                    (savePath + path[0]).split(defaultDataServer.getLoadPath())[1],
-                    (savePath + path[1]).split(defaultDataServer.getLoadPath())[1]
+                    loadPath.split(serverLoadPath)[1],
+                    (savePath + path[0]).split(serverLoadPath)[1],
+                    (savePath + path[1]).split(serverLoadPath)[1]
                 )
             );
         }
