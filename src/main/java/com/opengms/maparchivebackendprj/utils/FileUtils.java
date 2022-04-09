@@ -576,12 +576,12 @@ public class FileUtils {
                 Cell titleCell = titleRow.getCell(index);
                 Cell cell = row.getCell(index);
                 // cell.setCellType(XSSFCell.CELL_TYPE_STRING); 过期，使用下面替换
-                if (cell != null){ //防止空指针异常
-                    cell.setCellType(CellType.STRING);
-                    if (cell.getStringCellValue().equals("")) {
-                        continue;
-                    }
-                }
+//                if (cell != null){ //防止空指针异常
+//                    cell.setCellType(CellType.STRING);
+//                    if (cell.getStringCellValue().equals("")) {
+//                        continue;
+//                    }
+//                }
                 map.put(getString(titleCell), getString(cell));
             }
             if (map.isEmpty()) {
