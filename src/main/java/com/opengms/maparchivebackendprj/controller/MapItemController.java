@@ -310,6 +310,7 @@ public class MapItemController {
     @RequestMapping(value = "/process/batch", method = RequestMethod.POST)
     public JsonResult batchProcess(@RequestBody BatchProcessDTO processDTO, HttpServletRequest request){
 
+        log.info("request /mapItem/batch");
 
         User user = userService.getUserByToken(request);
         if (user == null){
