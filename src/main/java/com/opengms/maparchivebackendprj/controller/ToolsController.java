@@ -10,9 +10,15 @@ import com.opengms.maparchivebackendprj.entity.bo.GenericId;
 import com.opengms.maparchivebackendprj.entity.bo.JsonResult;
 <<<<<<< HEAD
 import com.opengms.maparchivebackendprj.entity.bo.config.DataServer;
+<<<<<<< .mine
 =======
 import com.opengms.maparchivebackendprj.entity.dto.CheckDTO;
 >>>>>>> wenfei
+=======
+import com.opengms.maparchivebackendprj.entity.dto.CheckDTO;
+
+
+>>>>>>> .theirs
 import com.opengms.maparchivebackendprj.entity.dto.ClassificationTreeDTO;
 import com.opengms.maparchivebackendprj.entity.po.ClassificationTree;
 import com.opengms.maparchivebackendprj.entity.po.MetadataTable;
@@ -56,13 +62,10 @@ public class ToolsController {
     @Autowired
     IClassificationTreeDao classificationTreeDao;
 
-<<<<<<< HEAD
     @Resource(name = "dataServerList")
     List<DataServer> dataServerList;
-=======
     @Autowired
     ToolsServiceImpl toolsService;
->>>>>>> wenfei
 
     // @ApiOperation(value = "第一步，生成与数据库对应的表的目录" )
     // @RequestMapping(value = "/baseCLSMapDB", method = RequestMethod.GET)
