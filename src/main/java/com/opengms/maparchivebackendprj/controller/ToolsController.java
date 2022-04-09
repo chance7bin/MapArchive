@@ -8,10 +8,15 @@ import com.opengms.maparchivebackendprj.dao.IMapItemCLSDao;
 import com.opengms.maparchivebackendprj.dao.IMetadataTableDao;
 import com.opengms.maparchivebackendprj.entity.bo.GenericId;
 import com.opengms.maparchivebackendprj.entity.bo.JsonResult;
+<<<<<<< HEAD
 import com.opengms.maparchivebackendprj.entity.bo.config.DataServer;
+=======
+import com.opengms.maparchivebackendprj.entity.dto.CheckDTO;
+>>>>>>> wenfei
 import com.opengms.maparchivebackendprj.entity.dto.ClassificationTreeDTO;
 import com.opengms.maparchivebackendprj.entity.po.ClassificationTree;
 import com.opengms.maparchivebackendprj.entity.po.MetadataTable;
+import com.opengms.maparchivebackendprj.service.impl.ToolsServiceImpl;
 import com.opengms.maparchivebackendprj.utils.FileUtils;
 import com.opengms.maparchivebackendprj.utils.ResultUtils;
 import io.swagger.annotations.Api;
@@ -51,8 +56,13 @@ public class ToolsController {
     @Autowired
     IClassificationTreeDao classificationTreeDao;
 
+<<<<<<< HEAD
     @Resource(name = "dataServerList")
     List<DataServer> dataServerList;
+=======
+    @Autowired
+    ToolsServiceImpl toolsService;
+>>>>>>> wenfei
 
     // @ApiOperation(value = "第一步，生成与数据库对应的表的目录" )
     // @RequestMapping(value = "/baseCLSMapDB", method = RequestMethod.GET)
@@ -389,6 +399,12 @@ public class ToolsController {
         }
 
 
+    }
+
+    @ApiOperation(value = "文件名匹配详情" )
+    @RequestMapping(value = "/statisticsMatchCount", method = RequestMethod.GET)
+    public JsonResult statisticsMatchCount(@RequestBody CheckDTO checkDTO){
+        return toolsService.statisticsMatchCount(checkDTO);
     }
 
     @ApiOperation(value = "得到uuid" )

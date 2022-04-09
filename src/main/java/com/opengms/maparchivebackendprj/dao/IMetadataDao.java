@@ -33,4 +33,7 @@ public interface IMetadataDao {
 
     long countMetadataBySearchText(String curQueryField, String searchText,  String collection);
 
+    //查找对应比例尺元数据
+    List<JSONObject> findBSMMetadata(String clsNameCn);
+
 }
