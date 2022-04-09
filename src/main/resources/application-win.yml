@@ -1,8 +1,9 @@
 spring:
   data:
     mongodb:
-#      uri: mongodb://127.0.0.1/MapArchive
-      uri: mongodb://172.21.213.33/MapArchiveDB
+#      uri: mongodb://172.21.212.168/MapArchive
+      uri: mongodb://127.0.0.1/MapArchive
+#      uri: mongodb://172.21.213.33/MapArchiveDB
 
 
 #resourcePath: /home/MapArchive/mapArchiveFiles
