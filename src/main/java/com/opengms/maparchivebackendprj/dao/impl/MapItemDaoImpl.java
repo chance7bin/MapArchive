@@ -167,7 +167,7 @@ public class MapItemDaoImpl implements IMapItemDao {
         Query query = new Query();
         query.addCriteria(Criteria.where("processStatus").in(statusEnums));
         query.addCriteria(Criteria.where("hasNeedManual").is(hasNeedManual));
-        return mongoTemplate.find(query, MapItem.class);
+        return mongoTemplate.find(query.with(pageable), MapItem.class);
 
     }
 
