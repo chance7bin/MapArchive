@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.opengms.maparchivebackendprj.entity.bo.JsonResult;
 import com.opengms.maparchivebackendprj.entity.dto.FindDTO;
 import com.opengms.maparchivebackendprj.entity.dto.User.UserRegisterDTO;
+import com.opengms.maparchivebackendprj.entity.dto.User.UserUpdatePwdDTO;
 import com.opengms.maparchivebackendprj.entity.enums.UserRoleEnum;
 import com.opengms.maparchivebackendprj.entity.po.User;
 
@@ -31,4 +32,6 @@ public interface IUserService {
     JsonResult updateRole(String userId, UserRoleEnum role);
 
     JsonResult deleteUser(String userId);
+
+    JsonResult updatePwd(UserUpdatePwdDTO user);
 }

@@ -579,17 +579,17 @@ public class MetadataServiceImpl implements IMetadataService {
 
         }
         //进行数据库的匹配
-//        else {
-//
-//            // 先匹配 原图幅编号+年份 这一列
-//            List<JSONObject> list = metadataDao.findBSMMetadataByOriginalNumAndYear(collection, formatFilename);
-//            if (list.size() == 1)
-//                return list.get(0);
-//            // 再匹配 原图幅编号这一列
-//            List<JSONObject> list1 = metadataDao.findBSMMetadataByOriginalNum(collection, formatFilename);
-//            if (list1.size() == 1)
-//                return list1.get(0);
-//        }
+       else {
+
+           // 先匹配 原图幅编号+年份 这一列
+           List<JSONObject> list = metadataDao.findMetadataByOriginalNumAndYear(formatFilename, collection);
+           if (list.size() == 1)
+               return list.get(0);
+           // 再匹配 原图幅编号这一列
+           List<JSONObject> list1 = metadataDao.findMetadataByOriginalNum(formatFilename, collection);
+           if (list1.size() == 1)
+               return list1.get(0);
+       }
         return null;
     }
 }

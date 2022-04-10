@@ -23,4 +23,8 @@ public interface ILogService {
 
 
     void insertLogInfo(String name, List<String> itemListId, OperateTypeEnum operateType);
+
+    JsonResult countList(FindDTO findDTO);
+
+    JsonResult countListByType(FindDTO findDTO, OperateTypeEnum operateType);
 }

@@ -10,6 +10,7 @@ import com.opengms.maparchivebackendprj.entity.bo.JsonResult;
 import com.opengms.maparchivebackendprj.entity.bo.PageableResult;
 import com.opengms.maparchivebackendprj.entity.dto.FindDTO;
 import com.opengms.maparchivebackendprj.entity.dto.User.UserRegisterDTO;
+import com.opengms.maparchivebackendprj.entity.dto.User.UserUpdatePwdDTO;
 import com.opengms.maparchivebackendprj.entity.enums.OperateTypeEnum;
 import com.opengms.maparchivebackendprj.entity.enums.UserRoleEnum;
 import com.opengms.maparchivebackendprj.entity.po.LogInfo;
@@ -178,6 +179,25 @@ public class UserServiceImpl implements IUserService {
         userDao.delete(user);
 
         return ResultUtils.success();
+    }
+
+    @Override
+    public JsonResult updatePwd(UserUpdatePwdDTO user) {
+
+        if (user.getPassword().equals(user.getNewPassword())){
+            return ResultUtils.error("两次密码相同，请输入新的密码");
+        }
+
+
+        User old = userDao.findByName(user.getName());
+
+        if(!old.getPassword().equals(DigestUtils.sha256Hex(user.getPassword()))){
+            return ResultUtils.error("旧密码输入错误");
+        }
+
+        old.setPassword(DigestUtils.sha256Hex(user.getNewPassword().getBytes()));
+        return ResultUtils.success(userDao.save(old));
+
     }
 
 
