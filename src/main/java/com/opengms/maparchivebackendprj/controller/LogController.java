@@ -9,6 +9,7 @@ import com.opengms.maparchivebackendprj.utils.ResultUtils;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import oracle.jdbc.proxy.annotation.Post;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,26 +32,45 @@ public class LogController {
 
 
     @ApiOperation(value = "得到日志列表" )
-    @GetMapping("/list")
+    @PostMapping("/list")
     public JsonResult getList(@RequestBody FindDTO findDTO){
 
         if (!genericService.checkFindDTOParams(findDTO)){
             return ResultUtils.error("参数错误");
         }
-
         return logService.getList(findDTO);
     }
 
 
     @ApiOperation(value = "根据操作类型得到日志列表" )
-    @GetMapping("/list/{type}")
+    @PostMapping("/list/{type}")
     public JsonResult getListByType(@RequestBody FindDTO findDTO,@PathVariable(value = "type") OperateTypeEnum operateType){
 
         if (!genericService.checkFindDTOParams(findDTO)){
             return ResultUtils.error("参数错误");
         }
-
         return logService.getListByType(findDTO,operateType);
+    }
+
+    @ApiOperation(value = "得到日志列表" )
+    @PostMapping("/count/list")
+    public JsonResult countList(@RequestBody FindDTO findDTO){
+
+        if (!genericService.checkFindDTOParams(findDTO)){
+            return ResultUtils.error("参数错误");
+        }
+        return logService.countList(findDTO);
+    }
+
+
+    @ApiOperation(value = "根据操作类型得到日志列表" )
+    @PostMapping("/count/list/{type}")
+    public JsonResult countListByType(@RequestBody FindDTO findDTO,@PathVariable(value = "type") OperateTypeEnum operateType){
+
+        if (!genericService.checkFindDTOParams(findDTO)){
+            return ResultUtils.error("参数错误");
+        }
+        return logService.countListByType(findDTO,operateType);
     }
 
 }
