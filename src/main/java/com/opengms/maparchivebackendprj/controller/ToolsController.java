@@ -58,6 +58,16 @@ public class ToolsController {
     @Autowired
     ToolsServiceImpl toolsService;
 
+    @GetMapping("/test")
+    public String test(){
+        log.trace("trace");
+        log.debug("debug");
+        log.info("info");
+        log.warn("warn");
+        log.error("error");
+        return "hello world";
+    }
+
     // @ApiOperation(value = "第一步，生成与数据库对应的表的目录" )
     // @RequestMapping(value = "/baseCLSMapDB", method = RequestMethod.GET)
     // JsonResult generateBaseCLS(){

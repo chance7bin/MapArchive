@@ -99,7 +99,7 @@ public class FileTransferServiceImpl implements IFileTransferService {
         // String zipDir = mapItemDir + "/uploadZip";
         String zipDir = "/uploadZip";
         // String uploadPath = isZip ? (resourcePath + zipDir) : (resourcePath + fileDir);
-        String uploadPath = isZip ? (loadPath + mapItemDir + zipDir) : (defaultDataServer.getLoadPath() + mapItemDir + fileDir);
+        String uploadPath = isZip ? (loadPath + mapItemDir + zipDir) : (loadPath + mapItemDir + fileDir);
 
         // String localFileName = chunk.getIdentifier() + "_" + chunk.getFilename();
         String localFileName = fileName;
