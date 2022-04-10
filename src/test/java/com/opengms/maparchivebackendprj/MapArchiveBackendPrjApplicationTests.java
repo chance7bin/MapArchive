@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.opengms.maparchivebackendprj.dao.IClassificationTreeDao;
+import com.opengms.maparchivebackendprj.dao.IMetadataDao;
 import com.opengms.maparchivebackendprj.dao.IMetadataTableDao;
 import com.opengms.maparchivebackendprj.dao.IMapItemCLSDao;
 import com.opengms.maparchivebackendprj.entity.bo.config.DataServer;
@@ -324,6 +325,22 @@ class MapArchiveBackendPrjApplicationTests {
     void buildClassifications(){
         List<String> list = mapItemService.buildClassifications("6e61e393-5765-4788-b43d-99d0252591d4");
         System.out.println();
+    }
+
+
+    @Autowired
+    IMetadataDao metadataDao;
+
+    @Test
+    void metadataTest(){
+        String collection = "BASIC_SCALE_MAP_TEN";
+        // String formatFilename = "14-52-134(1966)";
+        String formatFilename = "14-52-133";
+        // List<JSONObject> list = metadataDao.findMetadataByOriginalNumAndYear(collection, formatFilename);
+        List<JSONObject> list = metadataDao.findMetadataByOriginalNum(formatFilename, collection);
+
+        System.out.println();
+
     }
 
 }

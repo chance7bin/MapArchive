@@ -6,6 +6,7 @@ import com.opengms.maparchivebackendprj.entity.bo.JsonResult;
 import com.opengms.maparchivebackendprj.entity.dto.FindDTO;
 import com.opengms.maparchivebackendprj.entity.dto.User.UserLoginDTO;
 import com.opengms.maparchivebackendprj.entity.dto.User.UserRegisterDTO;
+import com.opengms.maparchivebackendprj.entity.dto.User.UserUpdatePwdDTO;
 import com.opengms.maparchivebackendprj.entity.enums.UserRoleEnum;
 import com.opengms.maparchivebackendprj.entity.po.User;
 import com.opengms.maparchivebackendprj.service.IGenericService;
@@ -46,6 +47,13 @@ public class UserController {
     @RequestMapping(value = "/login",method = RequestMethod.POST)
     public JsonResult doLogin(@RequestBody UserLoginDTO user){
         return userService.login(user.getName(),user.getPassword());
+    }
+
+    @ApiOperation(value = "修改密码" )
+    @RequestMapping(value = "/update/pwd",method = RequestMethod.POST)
+    public JsonResult updatePwd(@RequestBody UserUpdatePwdDTO user){
+
+        return userService.updatePwd(user);
     }
 
 
