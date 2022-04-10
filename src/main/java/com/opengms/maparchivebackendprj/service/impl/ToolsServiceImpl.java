@@ -97,7 +97,7 @@ public class ToolsServiceImpl implements ToolsService {
 
             }
         }
-        System.out.println(Database_name_block_only);
+//        System.out.println(Database_name_block_only);
 
 
         //List<String> allFile = getAllFile("D:\\地图档案文件名\\已查", false);
@@ -122,7 +122,6 @@ public class ToolsServiceImpl implements ToolsService {
             List<String> Match_Error_Multi = map1.get("Match_Error_Multi");
             List<String> Match_OK = map1.get("Match_OK");
             List<String> Match_Error_Options = map1.get("Match_Error_Options");
-
             matchFileNum += Match_OK.size();
             notMatchFileNum += Match_Error.size();
             notMatchFileNumMulti += Match_Error_Multi.size();
@@ -140,7 +139,7 @@ public class ToolsServiceImpl implements ToolsService {
         result.put("notMatchFileNumOption", notMatchFileNumOption);
         result.put("error_name", error_name1);
         result.put("error_part", error_part1);
-        System.out.println();
+
 
         return ResultUtils.success(result);
 
@@ -181,8 +180,9 @@ public class ToolsServiceImpl implements ToolsService {
                     int frequency = Collections.frequency(Database_name, name_without_idx);
                     if (frequency == 1) {
                         Match_OK.add(item);
+                        continue;
                     }
-                    continue;
+                    else item = name_without_idx;
                 }
 
                 String name_without_year;
@@ -198,14 +198,20 @@ public class ToolsServiceImpl implements ToolsService {
                 }
                 if(Database_name_year_dict.containsKey(name_without_year)){
                     List<String> strings = Database_name_year_dict.get(name_without_year);
-                    Set<String> set=new HashSet<>(strings);
-                    if (set.size()==1){
-                        Match_Error_Multi.add(item + ":" + strings);
-                    }else {
-                        Match_Error_Options.add(item + ":" + strings);
+                    if(strings.size()>1){
+                        Set<String> set = new HashSet<>(strings);
+                        if (set.size() == 1) {
+                            Match_Error_Multi.add(item + ":" + strings);
+                        }
+                        else {
+                            Match_Error_Options.add(item + ":" + strings);
+                        }
+                    }
+                    else {
+                        Match_Error.add(item);
                     }
                 }
-                else {
+                else{
                     Match_Error.add(item);
                 }
             }
@@ -216,6 +222,10 @@ public class ToolsServiceImpl implements ToolsService {
                     Match_OK.add(item);
                 }
                 else {
+                    //分开原图幅编号和时间
+                    int first_brace = item.lastIndexOf('(');      //找到从右到左第一个左括号，认为前面是图幅，后面是年份
+                    int second_brace = item.lastIndexOf(')');     //找到从右到左第一个右括号，认为前面是年份
+                    item = item.substring(0, first_brace);    //图幅编号
                     if(Database_name_year_dict.containsKey(item)) {
                         List<String> strings = Database_name_year_dict.get(item);
                         Set<String> set = new HashSet<>(strings);
@@ -225,6 +235,7 @@ public class ToolsServiceImpl implements ToolsService {
                             Match_Error_Options.add(item + ":" + strings);
                         }
                     }
+                    else Match_Error_Multi.add(item);
                 }
             }
 

@@ -561,6 +561,7 @@ public class MetadataServiceImpl implements IMetadataService {
 //                }
                 return null;
             }
+
             else {  //跟原图幅编号+年份的匹配
                 int frequency = Collections.frequency(Database_name, formatFilename);
 
@@ -570,26 +571,26 @@ public class MetadataServiceImpl implements IMetadataService {
                     return null;
                 }
             }
-
-            // if (count == 1){
-            //     return maps.get(index);
-            // } else {
-            //     return null;
-            // }
-
         }
         //进行数据库的匹配
-//        else {
-//
-//            // 先匹配 原图幅编号+年份 这一列
-//            List<JSONObject> list = metadataDao.findBSMMetadataByOriginalNumAndYear(collection, formatFilename);
-//            if (list.size() == 1)
-//                return list.get(0);
-//            // 再匹配 原图幅编号这一列
-//            List<JSONObject> list1 = metadataDao.findBSMMetadataByOriginalNum(collection, formatFilename);
-//            if (list1.size() == 1)
-//                return list1.get(0);
-//        }
-        return null;
+        else {
+            // 先匹配 原图幅编号+年份 这一列
+            List<JSONObject> list = metadataDao.findMetadataByOriginalNumAndYear(formatFilename,collection);
+            if (list.size() == 1)
+                return list.get(0);
+            // 再匹配 原图幅编号这一列
+            List<JSONObject> list1 = metadataDao.findMetadataByOriginalNum(formatFilename,collection);
+            if (list1.size() == 1)
+                return list1.get(0);
+            //匹配<>的情况
+            if (formatFilename.indexOf('<') > 0){
+                String name_without_idx;
+                name_without_idx = formatFilename.substring(0, formatFilename.indexOf('<'));
+                List<JSONObject> list2 = metadataDao.findMetadataByOriginalNumAndYear(formatFilename,collection);
+                if (list2.size() == 1)
+                return list.get(0);
+            }
+            return null;
+        }
     }
 }
