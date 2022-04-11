@@ -406,7 +406,7 @@ public class ToolsController {
     }
 
     @ApiOperation(value = "文件名匹配详情" )
-    @RequestMapping(value = "/statisticsMatchCount", method = RequestMethod.GET)
+    @RequestMapping(value = "/statisticsMatchCount", method = RequestMethod.POST)
     public JsonResult statisticsMatchCount(@RequestBody CheckDTO checkDTO){
         return toolsService.statisticsMatchCount(checkDTO);
     }
