@@ -6,6 +6,7 @@ import com.opengms.maparchivebackendprj.dao.IMetadataTableDao;
 import com.opengms.maparchivebackendprj.entity.bo.JsonResult;
 import com.opengms.maparchivebackendprj.entity.bo.config.DataServer;
 import com.opengms.maparchivebackendprj.entity.dto.Chunk;
+import com.opengms.maparchivebackendprj.entity.dto.MapChunk;
 import com.opengms.maparchivebackendprj.entity.po.FileInfo;
 import com.opengms.maparchivebackendprj.entity.po.MetadataTable;
 import com.opengms.maparchivebackendprj.service.IFileTransferService;
@@ -54,7 +55,7 @@ public class FileTransferServiceImpl implements IFileTransferService {
     IGenericService genericService;
 
     @Override
-    public JsonResult uploadBigFile(Chunk chunk, HttpServletResponse response) {
+    public JsonResult uploadMapFile(MapChunk chunk, HttpServletResponse response) {
 
         /**
          * 每一个上传块都会包含如下分块信息：
@@ -77,6 +78,7 @@ public class FileTransferServiceImpl implements IFileTransferService {
 
 
         if (chunk.getServername() == null || chunk.getServername().equals("")){
+            response.setStatus(500);
             return ResultUtils.error("未找到指定数据服务器");
         }
         String loadPath = genericService.getLoadPath(chunk.getServername());
@@ -181,6 +183,80 @@ public class FileTransferServiceImpl implements IFileTransferService {
             dto.add(fileInfo);
 
             return ResultUtils.success(dto);
+        }else {
+            response.setStatus(201);
+            return ResultUtils.success("upload part success");
+        }
+    }
+
+    @Override
+    public JsonResult uploadFile(Chunk chunk, HttpServletResponse response) {
+
+        // 判断文件类型
+        String fileName = chunk.getFilename();
+        String[] split = fileName.split("\\.");
+        String fileType = split[split.length - 1];
+
+        if(fileType.equals("zip") || fileType.equals("rar")){
+            response.setStatus(500);
+            return ResultUtils.error("不能上传压缩包");
+        }
+
+
+        String uploadPath = resourcePath + mapItemDir + "/uploadFile";
+        String localFileName = System.currentTimeMillis() + "_" + fileName;
+        File file= new File(uploadPath + "/" + localFileName);
+        //第一个块,则新建文件
+        if(chunk.getChunkNumber()==1 && !file.exists()){
+
+            boolean b = FileUtils.mkFile(file);
+            if (!b){
+                response.setStatus(500);
+                return ResultUtils.error("exception:createFileException");
+            }
+        }
+
+        //进行写文件操作
+        InputStream is = null;
+        RandomAccessFile raf = null;
+        try{
+            //将块文件写入文件中
+            is = chunk.getFile().getInputStream();
+            raf =new RandomAccessFile(file,"rw");
+            int len = -1;
+            byte[] buffer=new byte[1024];
+            raf.seek((chunk.getChunkNumber()-1) * chunk.getChunkSize());
+            while((len = is.read(buffer)) != -1){
+                raf.write(buffer,0,len);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            if(chunk.getChunkNumber()==1) {
+                file.delete();
+            }
+            response.setStatus(507);
+            return ResultUtils.error("exception:writeFileException");
+        } finally {
+            // 注意要把流给关了，不然后面的文件删不掉
+            try {
+                if (raf != null) {
+                    raf.close();
+                }
+                if (is != null) {
+
+                    is.close();
+                }
+            }catch (IOException e) {
+                log.error("InputStream close error");
+            }
+        }
+        if(chunk.getChunkNumber().equals(chunk.getTotalChunks())){
+            response.setStatus(200);
+
+            // 向数据库中保存上传信息
+            FileInfo fileInfo = initFileInfo(localFileName, file.getAbsolutePath());
+
+            return ResultUtils.success(fileInfo);
         }else {
             response.setStatus(201);
             return ResultUtils.success("upload part success");

@@ -2,6 +2,7 @@ package com.opengms.maparchivebackendprj.entity.dto.mapItem;
 
 import lombok.Data;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -13,7 +14,8 @@ import java.util.Map;
 public class MapItemUpdateDTO {
 
     // Metadata metadata;
-
     Map<String, Object> metadata;
+
+    List<List<Double>> pointList;
 
 }

@@ -100,9 +100,6 @@ public class MapItemController {
             return ResultUtils.error("批处理的资源所在路径需在dataServer.xml配置文件中第一个server的loadPath下");
         }
 
-
-
-
         mapItemService.process(processDTO,user.getName(),mapCLS);
 
         return ResultUtils.success();
@@ -317,7 +314,7 @@ public class MapItemController {
             return ResultUtils.error("用户验证失败");
         }
 
-        mapItemService.batchProcess(processDTO);
+        mapItemService.batchProcess(processDTO,user.getName());
 
         return ResultUtils.success();
 
@@ -372,15 +369,53 @@ public class MapItemController {
 
 
     @UserLoginToken
-    @ApiOperation(value = "修改条目信息(目前只能修改元数据)" , notes = "@UserLoginToken")
+    @ApiOperation(value = "修改修改元数据信息" , notes = "@UserLoginToken")
     @PostMapping("/update/metadata/{id}")
     public JsonResult updateItemMetadata(
         @ApiParam(name = "id", value = "传的是mapItem里的id") @PathVariable String id, @RequestBody MapItemUpdateDTO mapItemUpdateDTO, HttpServletRequest request){
 
         User user = userService.getUserByToken(request);
         logService.insertLogInfo(user.getName(),Arrays.asList(id), OperateTypeEnum.UPDATE);
-        return mapItemService.updateItem(id, mapItemUpdateDTO);
+        return mapItemService.updateMetadata(id, mapItemUpdateDTO);
     }
 
+
+    @UserLoginToken
+    @ApiOperation(value = "修改修改元数据信息" , notes = "@UserLoginToken")
+    @PostMapping("/update/geoInfo/{id}")
+    public JsonResult updateItemGeo(
+        @ApiParam(name = "id", value = "传的是mapItem里的id") @PathVariable String id,
+        @RequestBody MapItemUpdateDTO mapItemUpdateDTO, HttpServletRequest request){
+
+        User user = userService.getUserByToken(request);
+        logService.insertLogInfo(user.getName(),Arrays.asList(id), OperateTypeEnum.UPDATE);
+        return mapItemService.updateGeoInfo(id, mapItemUpdateDTO);
+    }
+
+
+    @UserLoginToken
+    @ApiOperation(value = "生成缩略图" , notes = "@UserLoginToken")
+    @GetMapping("/process/thumbnail/{id}")
+    public JsonResult generateThumbnail(
+        @ApiParam(name = "id", value = "传的是mapItem里的id") @PathVariable String id,
+        HttpServletRequest request){
+
+        User user = userService.getUserByToken(request);
+        logService.insertLogInfo(user.getName(),Arrays.asList(id), OperateTypeEnum.THUMBNAIL);
+        return mapItemService.generateThumbnail(id);
+    }
+
+
+    @UserLoginToken
+    @ApiOperation(value = "生成瓦片" , notes = "@UserLoginToken")
+    @GetMapping("/process/tiles/{id}")
+    public JsonResult generateTiles(
+        @ApiParam(name = "id", value = "传的是mapItem里的id") @PathVariable String id,
+        HttpServletRequest request){
+
+        User user = userService.getUserByToken(request);
+        logService.insertLogInfo(user.getName(),Arrays.asList(id), OperateTypeEnum.TILES);
+        return mapItemService.generateTiles(id);
+    }
 
 }

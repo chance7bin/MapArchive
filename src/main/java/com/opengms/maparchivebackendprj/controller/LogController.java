@@ -32,7 +32,7 @@ public class LogController {
 
 
     @ApiOperation(value = "得到日志列表" )
-    @PostMapping("/list")
+    @PostMapping("/list/content")
     public JsonResult getList(@RequestBody FindDTO findDTO){
 
         if (!genericService.checkFindDTOParams(findDTO)){
@@ -43,7 +43,7 @@ public class LogController {
 
 
     @ApiOperation(value = "根据操作类型得到日志列表" )
-    @PostMapping("/list/{type}")
+    @PostMapping("/list/content/{type}")
     public JsonResult getListByType(@RequestBody FindDTO findDTO,@PathVariable(value = "type") OperateTypeEnum operateType){
 
         if (!genericService.checkFindDTOParams(findDTO)){
@@ -52,8 +52,8 @@ public class LogController {
         return logService.getListByType(findDTO,operateType);
     }
 
-    @ApiOperation(value = "得到日志列表" )
-    @PostMapping("/count/list")
+    @ApiOperation(value = "得到日志列表数量" )
+    @PostMapping("/list/count")
     public JsonResult countList(@RequestBody FindDTO findDTO){
 
         if (!genericService.checkFindDTOParams(findDTO)){
@@ -63,8 +63,8 @@ public class LogController {
     }
 
 
-    @ApiOperation(value = "根据操作类型得到日志列表" )
-    @PostMapping("/count/list/{type}")
+    @ApiOperation(value = "根据操作类型得到日志列表数量" )
+    @PostMapping("/list/count/{type}")
     public JsonResult countListByType(@RequestBody FindDTO findDTO,@PathVariable(value = "type") OperateTypeEnum operateType){
 
         if (!genericService.checkFindDTOParams(findDTO)){

@@ -12,6 +12,7 @@ import com.opengms.maparchivebackendprj.entity.bo.config.DataServer;
 import com.opengms.maparchivebackendprj.entity.bo.mapItem.GeoInfo;
 import com.opengms.maparchivebackendprj.entity.bo.mapItem.ImageUrl;
 import com.opengms.maparchivebackendprj.entity.bo.mapItem.ProcessParam;
+import com.opengms.maparchivebackendprj.entity.bo.mapItem.ScaleCoordinate;
 import com.opengms.maparchivebackendprj.entity.dto.FindDTO;
 import com.opengms.maparchivebackendprj.entity.dto.SpecificFindDTO;
 import com.opengms.maparchivebackendprj.entity.dto.mapItem.*;
@@ -136,7 +137,7 @@ public class MapItemServiceImpl implements IMapItemService {
 
         }
 
-        logDao.insert(new LogInfo(username,itemListId, OperateTypeEnum.UPLOAD,new Date()));
+        logDao.insert(new LogInfo(username,itemListId, OperateTypeEnum.MOUNT,new Date()));
 
 
     }
@@ -440,6 +441,86 @@ public class MapItemServiceImpl implements IMapItemService {
         return buildClassifications(clsId, basic);
     }
 
+    @Override
+    public JsonResult updateGeoInfo(String id, MapItemUpdateDTO mapItemUpdateDTO) {
+
+        MapItem mapItem = mapItemDao.findById(id);
+        if (mapItem == null)
+            return ResultUtils.error("no item");
+
+        List<List<Double>> pointList = mapItemUpdateDTO.getPointList();
+
+        Double leftLon = pointList.get(0).get(0);
+        Double rightLon = pointList.get(2).get(0);
+        Double bottomLat = pointList.get(0).get(1);
+        Double upperLat = pointList.get(2).get(1);
+
+        ScaleCoordinate coordinate = new ScaleCoordinate(leftLon, bottomLat, rightLon, upperLat);
+
+        GeoInfo geoInfo = geoInfoService.getGeoInfo(coordinate);
+
+        if (geoInfo != null){
+            mapItem.setCenter(geoInfo.getCenter());
+            mapItem.setPolygon(geoInfo.getPolygon());
+            mapItem.setHasCalcCoordinate(true);
+            // mapItem.setHasNeedManual(false);
+        } else {
+            mapItem.setHasCalcCoordinate(false);
+            // mapItem.setHasNeedManual(true);
+        }
+
+        if (genericService.hasProcessFinish(mapItem)){
+            mapItem.setHasNeedManual(false);
+        }
+
+        MapItem save = mapItemDao.save(mapItem);
+
+        return ResultUtils.success(save);
+
+    }
+
+    @Override
+    public JsonResult generateThumbnail(String id) {
+
+        MapItem mapItem = mapItemDao.findById(id);
+        if (mapItem == null)
+            return ResultUtils.error("未找到该条目");
+
+        if (mapItem.getProcessStatus() != StatusEnum.Finished)
+            return ResultUtils.error("该条目正在处理中，请稍后");
+
+        if (mapItem.getThumbnailStatus() == StatusEnum.Finished)
+            return ResultUtils.error("已生成缩略图");
+
+        mapItem.setProcessStatus(StatusEnum.Inited);
+        mapItemDao.save(mapItem);
+
+        asyncService.generateThumbnail(id);
+
+        return ResultUtils.success();
+
+    }
+
+    @Override
+    public JsonResult generateTiles(String id) {
+        MapItem mapItem = mapItemDao.findById(id);
+        if (mapItem == null)
+            return ResultUtils.error("未找到该条目");
+
+        if (mapItem.getProcessStatus() != StatusEnum.Finished)
+            return ResultUtils.error("该条目正在处理中，请稍后");
+
+        if (mapItem.getTileStatus() == StatusEnum.Finished)
+            return ResultUtils.error("已生成瓦片");
+
+        mapItem.setProcessStatus(StatusEnum.Inited);
+        mapItemDao.save(mapItem);
+
+        asyncService.generateTiles(id);
+
+        return ResultUtils.success();
+    }
+
     private List<String> buildClassifications(String clsId, ClassificationTree classificationTree){
         List<String> classifications = new ArrayList<>();
 
@@ -604,7 +685,7 @@ public class MapItemServiceImpl implements IMapItemService {
     }
 
     @Override
-    public void batchProcess(BatchProcessDTO processDTO) {
+    public void batchProcess(BatchProcessDTO processDTO,String username) {
 
         FindDTO findDTO = new FindDTO(1,processDTO.getProcessCount(),false,"createTime");
 
@@ -612,12 +693,18 @@ public class MapItemServiceImpl implements IMapItemService {
 
         List<MapItem> mapItemList = mapItemDao.findByStatusAndHasNeedManual(Arrays.asList(StatusEnum.Finished),true,pageable);
 
+        List<String> itemListId = new ArrayList<>();
 
         for (MapItem mapItem : mapItemList) {
+            mapItem.setProcessStatus(StatusEnum.Inited);
+            mapItemDao.save(mapItem);
+
+            itemListId.add(mapItem.getId());
 
             asyncService.batchProcess(mapItem,processDTO);
-
         }
+
+        logDao.insert(new LogInfo(username,itemListId, OperateTypeEnum.PROCESS,new Date()));
 
     }
 
@@ -752,7 +839,7 @@ public class MapItemServiceImpl implements IMapItemService {
     }
 
     @Override
-    public JsonResult updateItem(String id, MapItemUpdateDTO mapItemUpdateDTO) {
+    public JsonResult updateMetadata(String id, MapItemUpdateDTO mapItemUpdateDTO) {
 
         MapItem mapItem = mapItemDao.findById(id);
         if (mapItem == null)
@@ -761,6 +848,7 @@ public class MapItemServiceImpl implements IMapItemService {
         //更新元数据
         // mapItem.setMetadata(mapItemUpdateDTO.getMetadata());
         mapItem.setMetadata(mapItemUpdateDTO.getMetadata());
+        mapItem.setHasMatchMetaData(true);
 
         // 更新完元数据之后要重新计算地理坐标
         mapItem = genericService.setItemGeo(mapItem,mapItem.getMapCLSId());
@@ -769,9 +857,9 @@ public class MapItemServiceImpl implements IMapItemService {
             mapItem.setHasNeedManual(false);
         }
 
-        mapItemDao.save(mapItem);
+        MapItem save = mapItemDao.save(mapItem);
 
-        return ResultUtils.success();
+        return ResultUtils.success(save);
     }
 
 

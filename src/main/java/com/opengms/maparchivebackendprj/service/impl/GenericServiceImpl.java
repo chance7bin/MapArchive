@@ -180,16 +180,19 @@ public class GenericServiceImpl implements IGenericService {
                 .size(200, 200)
                 .toFile(outputPath);
 
-            // 执行完耗时方法要再请求一次数据库，防止该条目的信息不是最新的
-            // mapItem = mapItemDao.findById(mapItem.getId());
+
 
         }catch (Exception e){
             log.error(String.valueOf(e));
+            mapItem = mapItemDao.findById(mapItem.getId());
             mapItem.setThumbnailStatus(StatusEnum.Error);
             mapItem.setProcessStatus(StatusEnum.Error);
 
             return mapItemDao.save(mapItem);
         }
+
+        // 执行完耗时方法要再请求一次数据库，防止该条目的信息不是最新的
+        mapItem = mapItemDao.findById(mapItem.getId());
 
         mapItem.setThumbnailStatus(StatusEnum.Finished);
         mapItem.setProcessStatus(StatusEnum.Finished);

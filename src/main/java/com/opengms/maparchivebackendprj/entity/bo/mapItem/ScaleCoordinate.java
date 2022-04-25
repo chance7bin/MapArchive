@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * @Description
+ * @Description 自定义坐标对象
  * @Author bin
  * @Date 2022/02/28
  */
