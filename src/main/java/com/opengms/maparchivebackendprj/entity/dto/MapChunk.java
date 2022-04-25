@@ -1,5 +1,6 @@
 package com.opengms.maparchivebackendprj.entity.dto;
 
+import com.opengms.maparchivebackendprj.entity.enums.MapClassification;
 import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,7 +12,7 @@ import java.io.Serializable;
  * @Date 2021/10/21
  */
 @Data
-public class Chunk implements Serializable {
+public class MapChunk implements Serializable {
     /**
      * 当前文件块，从1开始
      */
@@ -49,5 +50,10 @@ public class Chunk implements Serializable {
      * 二进制文件
      */
     private MultipartFile file;
+
+    // private MapClassification mapCLS;
+    private String mapCLSId;
+
+    private String servername;
 
 }
