@@ -10,21 +10,21 @@ import lombok.AllArgsConstructor;
 @AllArgsConstructor
 public enum OperateTypeEnum {
 
-    REGISTER(0,"REGISTER"),
-    LOGIN(1,"LOGIN"),
-    UPLOAD(2, "UPLOAD"),
-    DOWNLOAD(3, "DOWNLOAD"),
-    DELETE(4, "DELETE"),
-    UPDATE(5, "UPDATE"),
-    THUMBNAIL(6, "THUMBNAIL"),
-    TILES(7, "TILES");
+    REGISTER("REGISTER"),
+    LOGIN("LOGIN"),
+    UPLOAD( "UPLOAD"),
+    MOUNT( "MOUNT"),
+    DOWNLOAD( "DOWNLOAD"),
+    DELETE( "DELETE"),
+    UPDATE( "UPDATE"),
+    THUMBNAIL( "THUMBNAIL"),
+    TILES( "TILES"),
+    PROCESS( "PROCESS"),
 
-    private int number;
+    ;
+
+
     private String text;
-
-    public int getNumber() {
-        return number;
-    }
 
     public String getText() {
         return text;

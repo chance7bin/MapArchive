@@ -71,6 +71,33 @@ public class MetadataController {
 
     }
 
+    @ApiOperation(value = "查询元数据表 findDTO里要指定searchText是根据什么字段查找的[curQueryField必填]" )
+    @RequestMapping(value = "/count/database", method = RequestMethod.POST)
+    public JsonResult countMetadata(@RequestBody SpecificFindDTO findDTO){
+
+        if (genericService.isEmptyString(findDTO.getCurQueryField())){
+            return ResultUtils.error("请输入curQueryField字段");
+        }
+
+        if (!genericService.checkFindDTOParams(findDTO)){
+            return ResultUtils.error("请填写正确的参数");
+        }
+
+        if (genericService.isEmptyString(findDTO.getMapCLSId())){
+            return ResultUtils.error("请传入mapItemCLSId");
+        }
+
+        MetadataTable cls = metadataTableService.findById(findDTO.getMapCLSId());
+        if (cls == null){
+            return ResultUtils.error("未找到对应的元数据表，请输入正确的clsId");
+        }
+
+
+        return metadataService.countMetadata(findDTO,cls.getCollection());
+
+
+    }
+
 
     @ApiOperation(value = "根据excel查询元数据表" )
     @RequestMapping(value = "/list/excel", method = RequestMethod.POST)

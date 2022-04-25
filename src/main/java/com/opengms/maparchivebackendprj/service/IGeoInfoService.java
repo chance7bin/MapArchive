@@ -1,6 +1,7 @@
 package com.opengms.maparchivebackendprj.service;
 
 import com.opengms.maparchivebackendprj.entity.bo.mapItem.GeoInfo;
+import com.opengms.maparchivebackendprj.entity.bo.mapItem.ScaleCoordinate;
 import com.opengms.maparchivebackendprj.entity.enums.MapClassification;
 
 /**
@@ -20,4 +21,5 @@ public interface IGeoInfoService {
     // TODO: 2022/3/24 改成直接根据文件名进行计算
     GeoInfo getCoordinate(String filename, String mapCLSId);
 
+    GeoInfo getGeoInfo(ScaleCoordinate coordinate);
 }

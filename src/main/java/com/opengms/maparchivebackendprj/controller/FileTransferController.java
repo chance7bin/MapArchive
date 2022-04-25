@@ -2,6 +2,7 @@ package com.opengms.maparchivebackendprj.controller;
 
 import com.opengms.maparchivebackendprj.entity.bo.JsonResult;
 import com.opengms.maparchivebackendprj.entity.dto.Chunk;
+import com.opengms.maparchivebackendprj.entity.dto.MapChunk;
 import com.opengms.maparchivebackendprj.entity.po.MetadataTable;
 import com.opengms.maparchivebackendprj.service.IFileTransferService;
 import com.opengms.maparchivebackendprj.service.IMetadataTableService;
@@ -10,7 +11,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,21 +44,31 @@ public class FileTransferController {
      * @param response 响应
      * @return 上传响应状态
      */
-    @ApiOperation(value = "上传文件，若是zip包则解压" )
-    @PostMapping("/upload/bigFile")
-    public JsonResult uploadBigFile(
-        @ModelAttribute Chunk chunk,
+    @ApiOperation(value = "上传地图文件，若是zip包则解压" )
+    @PostMapping("/upload/mapFile")
+    public JsonResult uploadMapFile(
+        @ModelAttribute MapChunk chunk,
         HttpServletResponse response
     ){
 
         String mapCLSId = chunk.getMapCLSId();
         MetadataTable mapCLS = metadataTableService.findById(mapCLSId);
         if (mapCLS == null){
+            response.setStatus(500);
             return ResultUtils.error("mapItem CLS 输入错误");
         }
 
-        return fileTransferService.uploadBigFile(chunk,response);
+        return fileTransferService.uploadMapFile(chunk,response);
     }
 
+
+    @ApiOperation(value = "上传文件，不支持上传zip包" )
+    @PostMapping("/upload/file")
+    public JsonResult uploadFile(
+        @ModelAttribute Chunk chunk,
+        HttpServletResponse response
+    ){
+        return fileTransferService.uploadFile(chunk,response);
+    }
 
 }

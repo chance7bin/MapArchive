@@ -37,4 +37,9 @@ public interface IAsyncService {
     //批量处理
     void batchProcess(MapItem mapItem, BatchProcessDTO processDTO);
 
+
+    void generateThumbnail(String mapId);
+
+    void generateTiles(String mapId);
+
 }

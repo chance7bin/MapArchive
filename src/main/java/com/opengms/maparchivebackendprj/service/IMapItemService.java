@@ -51,7 +51,7 @@ public interface IMapItemService {
     JsonResult countProcessingListStatusIsError(SpecificFindDTO findDTO, List<StatusEnum> statusEnums);
 
 
-    void batchProcess(BatchProcessDTO processDTO);
+    void batchProcess(BatchProcessDTO processDTO, String username);
 
     JsonResult checkFileExist(String mapItemId);
 
@@ -64,8 +64,13 @@ public interface IMapItemService {
 
     JsonResult deleteBatchItem(List<String> mapItemIdList);
 
-    JsonResult updateItem(String id, MapItemUpdateDTO mapItemUpdateDTO);
+    JsonResult updateMetadata(String id, MapItemUpdateDTO mapItemUpdateDTO);
 
     List<String> buildClassifications(String clsId);
 
+    JsonResult updateGeoInfo(String id, MapItemUpdateDTO mapItemUpdateDTO);
+
+    JsonResult generateThumbnail(String id);
+
+    JsonResult generateTiles(String id);
 }
