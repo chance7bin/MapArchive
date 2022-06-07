@@ -3,6 +3,7 @@ package com.opengms.maparchivebackendprj.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.opengms.maparchivebackendprj.dao.IFileInfoDao;
 import com.opengms.maparchivebackendprj.dao.IMetadataTableDao;
+import com.opengms.maparchivebackendprj.entity.bo.DBConnectMap;
 import com.opengms.maparchivebackendprj.entity.bo.JsonResult;
 import com.opengms.maparchivebackendprj.entity.bo.config.DataServer;
 import com.opengms.maparchivebackendprj.entity.dto.Chunk;
@@ -24,8 +25,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description
