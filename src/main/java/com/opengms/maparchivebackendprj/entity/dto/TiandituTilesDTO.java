@@ -6,12 +6,9 @@ import lombok.Data;
 /**
  * @Description
  * @Author bin
- * @Date 2021/12/09
+ * @Date 2022/05/02
  */
 @Data
-public class TilesDTO {
-    int zoom_level;
-    int tile_column;
-    int tile_row;
-
+public class TiandituTilesDTO extends TilesDTO{
+    LayerEnum tile_Layer;
 }
