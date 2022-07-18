@@ -46,7 +46,8 @@ public class SqliteConfig {
     @Bean(name = "mapboxConnection")
     Connection mapboxStatement() throws SQLException {
         // return getConnection("jdbc:sqlite:" + resourcePath + "/mapbox/2017-07-03_planet_z0_z14.mbtiles");
-        return getConnection("jdbc:sqlite:Z:/2017-07-03_planet_z0_z14.mbtiles");
+        // return getConnection("jdbc:sqlite:Z:/2017-07-03_planet_z0_z14.mbtiles");
+        return null;
         // return getConnection("jdbc:sqlite:Z:/trails.mbtiles");
     }
 
