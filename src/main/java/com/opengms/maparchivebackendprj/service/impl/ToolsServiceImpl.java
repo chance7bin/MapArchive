@@ -89,7 +89,8 @@ public class ToolsServiceImpl implements ToolsService {
         MetadataTable metadataTable = metadataTableDao.findById(mapCLSId);
 //        MetadataTable metadataTable = metadataTableDao.findById("62557289c557b94d30e28795");
         String collection = metadataTable.getCollection();
-        bsmMetadata = metadataDao.findMetadataBySearchText("比例尺", checkScale, collection, new Page());
+//        bsmMetadata = metadataDao.findMetadataBySearchText("比例尺", checkScale, collection);
+        bsmMetadata = metadataDao.findBSMMetadata(collection);
         List<String> Database_name = new ArrayList<>();
         List<String> Database_name_block_only = new ArrayList<>();
         Map<String,List<String>> Database_name_year_dict = new HashMap<>();
