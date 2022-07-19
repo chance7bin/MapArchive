@@ -56,12 +56,14 @@ public class MetadataServiceImpl implements IMetadataService {
     @Override
     public JsonResult getMetadataByExcel(ExcelPathDTO excelPathDTO) {
         String excelPath = excelPathDTO.getExcelPath();
+        String fileType = FileUtils.getFileType(excelPath);
+        if (!(fileType.equals("xls") || fileType.equals("xlsx")))
+            return ResultUtils.error("请传入xls或者xlsx格式的文件");
         try {
             List<Map<String, Object>> maps = FileUtils.redExcel(excelPath);
-
             return ResultUtils.success(maps);
         }catch (Exception e){
-            return ResultUtils.error();
+            return ResultUtils.error("解析excel出错，excel默认第一行为标题行");
         }
     }
 
@@ -74,9 +76,18 @@ public class MetadataServiceImpl implements IMetadataService {
 
         List<JSONObject> metadataList = metadataDao.findMetadataBySearchText(findDTO.getCurQueryField(),findDTO.getSearchText(),collection,pageable);
 
+        // long count = metadataDao.countMetadataBySearchText(findDTO.getCurQueryField(),findDTO.getSearchText(),collection);
+
+        return ResultUtils.success(metadataList);
+    }
+
+    @Override
+    public JsonResult countMetadata(SpecificFindDTO findDTO, String collection) {
+
         long count = metadataDao.countMetadataBySearchText(findDTO.getCurQueryField(),findDTO.getSearchText(),collection);
 
-        return ResultUtils.success(new PageableResult<>(count,metadataList));
+        return ResultUtils.success(count);
+
     }
 
     //得到文件名

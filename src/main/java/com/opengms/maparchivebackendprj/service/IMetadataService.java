@@ -27,4 +27,6 @@ public interface IMetadataService {
     JsonResult getMetadataByExcel(ExcelPathDTO excelPathDTO);
 
     JsonResult getMetadata(SpecificFindDTO findDTO, String collection);
+
+    JsonResult countMetadata(SpecificFindDTO findDTO, String collection);
 }

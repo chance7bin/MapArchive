@@ -247,7 +247,7 @@ public class GeoInfoServiceImpl implements IGeoInfoService {
     }
 
 
-    private GeoInfo getGeoInfo(ScaleCoordinate coordinate){
+    public GeoInfo getGeoInfo(ScaleCoordinate coordinate){
         double left_bottom_lat = coordinate.getLeft_Bottom_Lat();
         double left_bottom_lon = coordinate.getLeft_Bottom_Lon();
         double right_upper_lat = coordinate.getRight_Upper_Lat();

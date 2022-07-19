@@ -57,6 +57,8 @@ public class AsyncServiceImpl implements IAsyncService {
         // MapItem mapItem = new MapItem();
         mapItem.setProcessStatus(StatusEnum.Started);
 
+        mapItemDao.save(mapItem);
+
         //文件与地图条目进行关联
         if(fileInfo != null){
             mapItem.setRelativeFileId(fileInfo.getId());
@@ -65,11 +67,12 @@ public class AsyncServiceImpl implements IAsyncService {
 
         if (processDTO.isMatchMetadata()){
             mapItem = genericService.matchMetadata(mapItem,mapItem.getMapCLSId(),processDTO.getMetadataExcelPath());
-
+            mapItemDao.save(mapItem);
         }
 
         if (processDTO.isCalcGeoInfo()){
             mapItem = genericService.setItemGeo(mapItem, mapItem.getMapCLSId());
+            mapItemDao.save(mapItem);
         }
 
 
@@ -99,7 +102,6 @@ public class AsyncServiceImpl implements IAsyncService {
 
             path[1] += "/" + FileUtils.getFilenameNoSuffix(loadFile);
 
-            // 异步处理地图
             if (processDTO.isGenerateThumbnail()){
                 mapItem = genericService.generateThumbnailImage(mapItem,loadPath,savePath + path[0]);
             }
@@ -108,7 +110,6 @@ public class AsyncServiceImpl implements IAsyncService {
                 mapItem = genericService.generateTiles(mapItem,loadPath,savePath + path[1]);
             }
 
-            // 如果既没有生成缩略图也没有切片，那处理的状态设置为Finished
             mapItem.setProcessStatus(StatusEnum.Finished);
 
             if (genericService.hasProcessFinish(mapItem)){
@@ -158,21 +159,26 @@ public class AsyncServiceImpl implements IAsyncService {
         String loadPath = genericService.getLoadPath(mapItem.getServer());
 
         mapItem.setProcessStatus(StatusEnum.Started);
+        mapItemDao.save(mapItem);
 
         if (processDTO.isMatchMetadata() && !mapItem.isHasMatchMetaData()){
             mapItem = genericService.matchMetadata(mapItem, mapItem.getMapCLSId(), null);
+            mapItemDao.save(mapItem);
         }
 
         if (processDTO.isCalcGeoInfo() && !mapItem.isHasCalcCoordinate()){
             mapItem = genericService.setItemGeo(mapItem,mapItem.getMapCLSId());
+            mapItemDao.save(mapItem);
         }
 
         if (processDTO.isGenerateThumbnail() && (mapItem.getThumbnailStatus() != StatusEnum.Finished)){
             mapItem = genericService.generateThumbnailImage(mapItem,loadPath + param.getInputPath(),loadPath + param.getThumbnailOutputDir());
+            mapItemDao.save(mapItem);
         }
 
         if (processDTO.isGenerateTiles() && (mapItem.getTileStatus() != StatusEnum.Finished)){
             mapItem = genericService.generateTiles(mapItem,loadPath + param.getInputPath(),loadPath + param.getTilesOutputDir());
+            mapItemDao.save(mapItem);
         }
 
         mapItem.setProcessStatus(StatusEnum.Finished);
@@ -183,5 +189,58 @@ public class AsyncServiceImpl implements IAsyncService {
 
         mapItemDao.save(mapItem);
 
+    }
+
+    @Async
+    @Override
+    public void generateThumbnail(String mapId) {
+
+        MapItem mapItem = mapItemDao.findById(mapId);
+        mapItem.setProcessStatus(StatusEnum.Started);
+        mapItemDao.save(mapItem);
+
+        if (mapItem.getThumbnailStatus() != StatusEnum.Finished){
+
+            ProcessParam param = mapItem.getProcessParam();
+
+            String loadPath = genericService.getLoadPath(mapItem.getServer());
+
+            mapItem = genericService.generateThumbnailImage(mapItem,loadPath + param.getInputPath(),loadPath + param.getThumbnailOutputDir());
+            mapItemDao.save(mapItem);
+        }
+
+        mapItem.setProcessStatus(StatusEnum.Finished);
+
+        if (genericService.hasProcessFinish(mapItem)){
+            mapItem.setHasNeedManual(false);
+        }
+
+        mapItemDao.save(mapItem);
+    }
+
+    @Async
+    @Override
+    public void generateTiles(String mapId) {
+        MapItem mapItem = mapItemDao.findById(mapId);
+        mapItem.setProcessStatus(StatusEnum.Started);
+        mapItemDao.save(mapItem);
+
+        if (mapItem.getTileStatus() != StatusEnum.Finished){
+
+            ProcessParam param = mapItem.getProcessParam();
+
+            String loadPath = genericService.getLoadPath(mapItem.getServer());
+
+            mapItem = genericService.generateTiles(mapItem,loadPath + param.getInputPath(),loadPath + param.getTilesOutputDir());
+            mapItemDao.save(mapItem);
+        }
+
+        mapItem.setProcessStatus(StatusEnum.Finished);
+
+        if (genericService.hasProcessFinish(mapItem)){
+            mapItem.setHasNeedManual(false);
+        }
+
+        mapItemDao.save(mapItem);
     }
 }

@@ -43,6 +43,15 @@ public class SqliteConfig {
         return getConnection("jdbc:sqlite:" + resourcePath + "/tianditu/vec-cia/vec_c.mbtiles");
     }
 
+    @Bean(name = "mapboxConnection")
+    Connection mapboxStatement() throws SQLException {
+        // return getConnection("jdbc:sqlite:" + resourcePath + "/mapbox/2017-07-03_planet_z0_z14.mbtiles");
+        // return getConnection("jdbc:sqlite:Z:/2017-07-03_planet_z0_z14.mbtiles");
+        return null;
+        // return getConnection("jdbc:sqlite:Z:/trails.mbtiles");
+    }
+
+
 
     /**
      * 连接数据库 返回连接数据库的Connection 不能返回执行SQL语句的statement，

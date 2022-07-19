@@ -1,5 +1,7 @@
 package com.opengms.maparchivebackendprj.controller;
 
+import com.alibaba.fastjson.JSONObject;
+import com.opengms.maparchivebackendprj.entity.dto.TiandituTilesDTO;
 import com.opengms.maparchivebackendprj.entity.dto.TilesDTO;
 import com.opengms.maparchivebackendprj.entity.enums.LayerEnum;
 import com.opengms.maparchivebackendprj.service.ITilesService;
@@ -45,13 +47,42 @@ public class TilesController {
         // int tile_column = x;
         // int tile_row = y;
 
-        TilesDTO tilesDTO = new TilesDTO();
+        TiandituTilesDTO tilesDTO = new TiandituTilesDTO();
         tilesDTO.setTile_column(x);
         tilesDTO.setTile_row(y);
         tilesDTO.setZoom_level(z);
         tilesDTO.setTile_Layer(layer);
 
         tilesService.getTiandituTiles(tilesDTO, response);
+
+    }
+
+
+    @ApiOperation(value = "得到mapbox瓦片" )
+    @GetMapping("/mapbox/{z}/{x}/{y}.pbf")
+    public void getMapboxTiles(
+        @ApiParam(name = "z", value = "zoom_level") @PathVariable int z,
+        @ApiParam(name = "x", value = "tile_column") @PathVariable int x,
+        @ApiParam(name = "y", value = "tile_row") @PathVariable int y ,
+        HttpServletResponse response){
+
+
+        TilesDTO tilesDTO = new TilesDTO();
+        tilesDTO.setTile_column(x);
+        tilesDTO.setTile_row((int)(Math.pow(2,z)-1-y));
+        tilesDTO.setZoom_level(z);
+
+        tilesService.getMapboxTiles(tilesDTO, response);
+
+    }
+
+
+    // "https://api.maptiler.com/tiles/v3/tiles.json?key=XAapkmkXQpx839NCfnxD"
+    @ApiOperation(value = "得到mapbox元数据json" )
+    @GetMapping("/mapbox/metadata/tiles.json")
+    public JSONObject getMapboxTilesMetadataJson(){
+
+        return tilesService.getMapboxTilesMetadataJson();
 
     }
 
