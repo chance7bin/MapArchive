@@ -5,16 +5,16 @@ spring:
   data:
     mongodb:
 #      uri: mongodb://127.0.0.1/MapArchive
-      uri: mongodb://localhost/MapArchive
-#      uri: mongodb://172.21.213.33/MapArchiveDB
+#      uri: mongodb://localhost/MapArchive
+      uri: mongodb://172.21.213.33/MapArchiveDB
 #      uri: mongodb://172.21.212.168/MapArchive
 
 #  datasource:
 #    driver-class-name: org.sqlite.JDBC
 #    url: jdbc:sqlite:E:/mapArchiveFiles/demo.mbtiles
 
-resourcePath: E:/mapArchiveFiles
-#resourcePath: D:/mapArchiveFiles
+#resourcePath: E:/mapArchiveFiles
+resourcePath: D:/mapArchiveFiles
 #dataServerPath: Z:/
 #resourcePath: Z:/mapArchiveFiles
 
