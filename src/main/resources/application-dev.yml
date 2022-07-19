@@ -1,12 +1,12 @@
-#swagger:
-#  enable: true
+swagger:
+  enable: true
 
 spring:
   data:
     mongodb:
 #      uri: mongodb://127.0.0.1/MapArchive
-#      uri: mongodb://localhost/MapArchive
-      uri: mongodb://172.21.213.33/MapArchiveDB
+      uri: mongodb://localhost/MapArchive
+#      uri: mongodb://172.21.213.33/MapArchiveDB
 #      uri: mongodb://172.21.212.168/MapArchive
 
 #  datasource:
@@ -25,4 +25,4 @@ resourcePath: E:/mapArchiveFiles
 #  LOG_HOME: E:/mapArchiveFiles/logs
 
 
-#ipAndPort: "http://127.0.0.1:8999"
+ipAndPort: "http://127.0.0.1:8999"

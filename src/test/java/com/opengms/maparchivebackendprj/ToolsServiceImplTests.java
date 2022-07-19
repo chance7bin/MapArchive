@@ -15,8 +15,8 @@ public class ToolsServiceImplTests {
     @Test
     void statisticsMatchCount() {
         CheckDTO checkDTO = new CheckDTO();
-        checkDTO.setCheckDir("F:\\test\\Images\\1：2.5万");
-        checkDTO.setMapCLSId("ea07a0e4-642d-46ee-b375-d58fa881f552");
+        checkDTO.setCheckDir("F:\\test\\Images\\1：100万");
+        checkDTO.setMapCLSId("60d36541-e067-425a-a158-159cf0242306");
         JsonResult jsonResult = toolsService.statisticsMatchCount(checkDTO);
         System.out.println(jsonResult);
     }

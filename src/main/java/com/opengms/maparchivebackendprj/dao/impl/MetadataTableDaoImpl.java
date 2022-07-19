@@ -40,6 +40,7 @@ public class MetadataTableDaoImpl implements IMetadataTableDao {
 
     @Override
     public MetadataTable findById(String id) {
+//        return mongoTemplate.findById(id,MetadataTable.class,"MetadataTable");
         return mongoTemplate.findById(id, MetadataTable.class);
     }
 
