@@ -3,7 +3,6 @@ package com.opengms.maparchivebackendprj.service.impl;
 import com.alibaba.fastjson.JSONObject;
 import com.opengms.maparchivebackendprj.dao.IMetadataTableDao;
 import com.opengms.maparchivebackendprj.dao.impl.MetadataDaoImpl;
-import com.opengms.maparchivebackendprj.entity.Page;
 import com.opengms.maparchivebackendprj.entity.bo.JsonResult;
 import com.opengms.maparchivebackendprj.entity.dto.CheckDTO;
 import com.opengms.maparchivebackendprj.entity.po.MetadataTable;

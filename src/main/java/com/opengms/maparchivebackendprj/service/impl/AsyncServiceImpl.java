@@ -119,6 +119,8 @@ public class AsyncServiceImpl implements IAsyncService {
 
             String serverLoadPath = genericService.getLoadPath(processDTO.getServername());
 
+            // String processLoadPath = defaultDataServer.getLoadPath();
+
             // 设置生成的图片路径
             // mapItem中存的都是相对路径，定位文件位置用rootPath定位
 //            String originalUrl = fileInfo.getPath().replace("\\", "/");

@@ -60,8 +60,8 @@ public class MapItemController {
     @Autowired
     IMetadataTableService metadataTableService;
 
-    // @Resource(name="defaultDataServer")
-    // DataServer defaultDataServer;
+    @Resource(name="defaultDataServer")
+    DataServer defaultDataServer;
 
     @UserLoginToken
     @ApiOperation(value = "根据指定的物理地址对照片进行压缩和切片(包括地图类型和元数据)", notes = "@UserLoginToken")
@@ -92,17 +92,20 @@ public class MapItemController {
             return ResultUtils.error("未找到指定数据服务器");
         }
 
+        // String processLoadPath = defaultDataServer.getLoadPath();
+
         try {
             String loadPath = processDTO.getProcessingPath();
             loadPath = loadPath.replace("\\", "/");
-            log.info("loadPath:" + loadPath);
-            log.info("serverLoadPath:" + serverLoadPath);
-            String[] split = loadPath.split(serverLoadPath);
-            log.info("split[0]:" + split[0]);
-            log.info("split[1]:" + split[1]);
+            // log.info("loadPath:" + loadPath);
+            // log.info("serverLoadPath:" + serverLoadPath);
+            // String[] split = loadPath.split(serverLoadPath);
+            // log.info("split[0]:" + split[0]);
+            // log.info("split[1]:" + split[1]);
             String flag = loadPath.split(serverLoadPath)[1];
         }catch (Exception e){
-            return ResultUtils.error("批处理的资源所在路径需在dataServer.xml配置文件中第一个server的loadPath下");
+            // 批处理的资源所在路径需在dataServer.xml配置文件中第一个server的loadPath下
+            return ResultUtils.error("请选择数据服务器的文件路径");
         }
 
         mapItemService.process(processDTO,user.getName(),mapCLS);
