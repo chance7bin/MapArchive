@@ -85,6 +85,12 @@ public class MapItemServiceImpl implements IMapItemService {
     @Autowired
     IClassificationTreeDao classificationTreeDao;
 
+
+    @Resource(name="defaultDataServer")
+    DataServer defaultDataServer;
+
+
+
     // 异步调用处理任务，防止请求阻塞
     @Async
     @Override
