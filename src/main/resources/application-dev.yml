@@ -14,7 +14,7 @@ spring:
 #    url: jdbc:sqlite:E:/mapArchiveFiles/demo.mbtiles
 
 #resourcePath: E:/mapArchiveFiles
-resourcePath: D:/mapArchiveFiles
+resourcePath: E:/mapArchiveFiles
 #dataServerPath: Z:/
 #resourcePath: Z:/mapArchiveFiles
 

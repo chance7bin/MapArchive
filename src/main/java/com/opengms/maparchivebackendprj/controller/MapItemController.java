@@ -95,6 +95,11 @@ public class MapItemController {
         try {
             String loadPath = processDTO.getProcessingPath();
             loadPath = loadPath.replace("\\", "/");
+            log.info("loadPath:" + loadPath);
+            log.info("serverLoadPath:" + serverLoadPath);
+            String[] split = loadPath.split(serverLoadPath);
+            log.info("split[0]:" + split[0]);
+            log.info("split[1]:" + split[1]);
             String flag = loadPath.split(serverLoadPath)[1];
         }catch (Exception e){
             return ResultUtils.error("批处理的资源所在路径需在dataServer.xml配置文件中第一个server的loadPath下");

@@ -343,4 +343,15 @@ class MapArchiveBackendPrjApplicationTests {
 
     }
 
+    @Test
+    void testSplit(){
+        String loadPath = "D:/data/test2";
+        String server = "D:/data";
+        String[] split = loadPath.split(server);
+        System.out.println(split[1]);
+
+        System.out.println();
+
+    }
+
 }
