@@ -85,11 +85,18 @@ public class MetadataDaoImpl implements IMetadataDao {
         return mongoTemplate.count(query, JSONObject.class, collection);
     }
 
+//    @Override
+//    public List<JSONObject> findBSMMetadata(String clsNameCn) {
+//        Query query = new Query();
+//        query.addCriteria(Criteria.where("比例尺").is(clsNameCn));
+//        return mongoTemplate.find(query, JSONObject.class, "BASIC_SCALE_MAP_TWENTY");
+//
+//    }
+
     @Override
-    public List<JSONObject> findBSMMetadata(String clsNameCn) {
+    public List<JSONObject> findBSMMetadata(String collection) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("比例尺").is(clsNameCn));
-        return mongoTemplate.find(query, JSONObject.class, "basic_scale_map_metadata");
+        return mongoTemplate.find(query, JSONObject.class, collection);
 
     }
 

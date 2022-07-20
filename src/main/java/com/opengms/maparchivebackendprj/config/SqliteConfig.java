@@ -47,7 +47,8 @@ public class SqliteConfig {
     Connection mapboxStatement() throws SQLException {
         // return getConnection("jdbc:sqlite:" + resourcePath + "/mapbox/2017-07-03_planet_z0_z14.mbtiles");
         // return getConnection("jdbc:sqlite:Z:/2017-07-03_planet_z0_z14.mbtiles");
-        return null;
+        // 为了不报错，这个功能已经废弃了
+        return vecStatement();
         // return getConnection("jdbc:sqlite:Z:/trails.mbtiles");
     }
 

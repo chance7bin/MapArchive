@@ -1,16 +1,22 @@
 package com.opengms.maparchivebackendprj.service.impl;
 
 import com.alibaba.fastjson.JSONObject;
+import com.opengms.maparchivebackendprj.dao.IMetadataTableDao;
 import com.opengms.maparchivebackendprj.dao.impl.MetadataDaoImpl;
+import com.opengms.maparchivebackendprj.entity.Page;
 import com.opengms.maparchivebackendprj.entity.bo.JsonResult;
 import com.opengms.maparchivebackendprj.entity.dto.CheckDTO;
+import com.opengms.maparchivebackendprj.entity.po.MetadataTable;
 import com.opengms.maparchivebackendprj.service.ToolsService;
 import com.opengms.maparchivebackendprj.utils.ResultUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.LineIterator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -37,8 +43,11 @@ public class ToolsServiceImpl implements ToolsService {
 
     @Value("${resourcePath}")
     private String resourcePath;
-    
-    
+
+    @Autowired
+    IMetadataTableDao metadataTableDao;
+
+
     public JsonResult statisticsMatchCount(CheckDTO checkDTO) {
         int totalFileNum = 0;
         int formatFileNum = 0; //文件名规范的数量
@@ -76,7 +85,12 @@ public class ToolsServiceImpl implements ToolsService {
                 checkScale = "1:100万";
                 break;
         }
-        bsmMetadata = metadataDao.findBSMMetadata(checkScale);
+//        bsmMetadata = metadataDao.findBSMMetadata(checkScale);
+        MetadataTable metadataTable = metadataTableDao.findById(mapCLSId);
+//        MetadataTable metadataTable = metadataTableDao.findById("62557289c557b94d30e28795");
+        String collection = metadataTable.getCollection();
+//        bsmMetadata = metadataDao.findMetadataBySearchText("比例尺", checkScale, collection);
+        bsmMetadata = metadataDao.findBSMMetadata(collection);
         List<String> Database_name = new ArrayList<>();
         List<String> Database_name_block_only = new ArrayList<>();
         Map<String,List<String>> Database_name_year_dict = new HashMap<>();
@@ -97,7 +111,7 @@ public class ToolsServiceImpl implements ToolsService {
 
             }
         }
-        System.out.println(Database_name_block_only);
+//        System.out.println(Database_name_block_only);
 
 
         //List<String> allFile = getAllFile("D:\\地图档案文件名\\已查", false);
@@ -115,6 +129,8 @@ public class ToolsServiceImpl implements ToolsService {
             List<String> error_name = map.get("error_name");
             List<String> error_part = map.get("error_part");
 
+
+
             formatFileNum += Image_name.size();
 
             Map<String, List<String>> map1 = matchMetadata(Image_name, Database_name, Database_name_block_only, Database_name_year_dict);
@@ -122,7 +138,6 @@ public class ToolsServiceImpl implements ToolsService {
             List<String> Match_Error_Multi = map1.get("Match_Error_Multi");
             List<String> Match_OK = map1.get("Match_OK");
             List<String> Match_Error_Options = map1.get("Match_Error_Options");
-
             matchFileNum += Match_OK.size();
             notMatchFileNum += Match_Error.size();
             notMatchFileNumMulti += Match_Error_Multi.size();
@@ -130,6 +145,9 @@ public class ToolsServiceImpl implements ToolsService {
             error_name1 += error_name.size();
             error_part1 += error_part.size();
             a++;
+//            System.out.println(Match_Error);
+            System.out.println(error_name);
+
         }
         JSONObject result = new JSONObject();
         result.put("totalFileNum", totalFileNum);
@@ -140,7 +158,7 @@ public class ToolsServiceImpl implements ToolsService {
         result.put("notMatchFileNumOption", notMatchFileNumOption);
         result.put("error_name", error_name1);
         result.put("error_part", error_part1);
-        System.out.println();
+
 
         return ResultUtils.success(result);
 
@@ -181,10 +199,11 @@ public class ToolsServiceImpl implements ToolsService {
                     int frequency = Collections.frequency(Database_name, name_without_idx);
                     if (frequency == 1) {
                         Match_OK.add(item);
+                        continue;
                     }
-                    continue;
+                    else item = name_without_idx;
                 }
-
+                //处理其余的<>情况，以及包含时间的文件名但未被识别的情况
                 String name_without_year;
                 //分开原图幅编号和时间
                 int first_brace = item.lastIndexOf('(');      //找到从右到左第一个左括号，认为前面是图幅，后面是年份
@@ -198,14 +217,20 @@ public class ToolsServiceImpl implements ToolsService {
                 }
                 if(Database_name_year_dict.containsKey(name_without_year)){
                     List<String> strings = Database_name_year_dict.get(name_without_year);
-                    Set<String> set=new HashSet<>(strings);
-                    if (set.size()==1){
-                        Match_Error_Multi.add(item + ":" + strings);
-                    }else {
-                        Match_Error_Options.add(item + ":" + strings);
+                    if(strings.size()>1){   //除去时间匹配多项
+                        Set<String> set = new HashSet<>(strings);
+                        if (set.size() == 1) {
+                            Match_Error_Multi.add(item + ":" + strings);
+                        }
+                        else {
+                            Match_Error_Options.add(item + ":" + strings);
+                        }
+                    }
+                    else {
+                        Match_Error_Options.add(item + ":" + strings);      //文件名包含时间不对，匹配出一个不同时间的结果
                     }
                 }
-                else {
+                else{
                     Match_Error.add(item);
                 }
             }
@@ -216,6 +241,10 @@ public class ToolsServiceImpl implements ToolsService {
                     Match_OK.add(item);
                 }
                 else {
+                    //分开原图幅编号和时间
+                    int first_brace = item.lastIndexOf('(');      //找到从右到左第一个左括号，认为前面是图幅，后面是年份
+                    int second_brace = item.lastIndexOf(')');     //找到从右到左第一个右括号，认为前面是年份
+                    item = item.substring(0, first_brace);    //图幅编号
                     if(Database_name_year_dict.containsKey(item)) {
                         List<String> strings = Database_name_year_dict.get(item);
                         Set<String> set = new HashSet<>(strings);
@@ -225,6 +254,7 @@ public class ToolsServiceImpl implements ToolsService {
                             Match_Error_Options.add(item + ":" + strings);
                         }
                     }
+                    else Match_Error_Multi.add(item);
                 }
             }
 
@@ -556,14 +586,31 @@ public class ToolsServiceImpl implements ToolsService {
             filename = get_english_name(filename);
 
             //将(1)(2)(3)(4)转换为<1><2><3><4>,以免和年份混淆
-            if (filename.endsWith("(1)") || filename.endsWith("(2)") || filename.endsWith("(3)") || filename.endsWith("(4)")) {
-                String name1, name2;
-                name1 = filename.substring(0, filename.lastIndexOf('('));
-                name2 = filename.substring(filename.lastIndexOf('('));
-                name2 = name2.replace('(', '<');
-                name2 = name2.replace(')', '>');
-                filename = name1 + name2;
+            if(checkScale == "1:20万"){
+                int oldCount = filename.length();
+                int newCount = filename.replace("(","").length();
+                if(oldCount - newCount>1){      //20w分幅最后有-(4)会造成干扰
+                    if (filename.endsWith("(1)") || filename.endsWith("(2)") || filename.endsWith("(3)") || filename.endsWith("(4)") || filename.endsWith("(5)") || filename.endsWith("(6)")) {
+                        String name1, name2;
+                        name1 = filename.substring(0, filename.lastIndexOf('('));
+                        name2 = filename.substring(filename.lastIndexOf('('));
+                        name2 = name2.replace('(', '<');
+                        name2 = name2.replace(')', '>');
+                        filename = name1 + name2;
+                    }
+                }
             }
+            else {
+                if (filename.endsWith("(1)") || filename.endsWith("(2)") || filename.endsWith("(3)") || filename.endsWith("(4)") || filename.endsWith("(5)") || filename.endsWith("(6)")) {
+                    String name1, name2;
+                    name1 = filename.substring(0, filename.lastIndexOf('('));
+                    name2 = filename.substring(filename.lastIndexOf('('));
+                    name2 = name2.replace('(', '<');
+                    name2 = name2.replace(')', '>');
+                    filename = name1 + name2;
+                }
+            }
+
 
             String name_without_year;
             String name_after_year;
@@ -571,7 +618,7 @@ public class ToolsServiceImpl implements ToolsService {
             int first_brace = filename.lastIndexOf('(');      //找到从右到左第一个左括号，认为前面是图幅，后面是年份
             int second_brace = filename.lastIndexOf(')');     //找到从右到左第一个右括号，认为前面是年份
             int potential_year_count = second_brace - first_brace + 1;
-            if(potential_year_count != 6 && potential_year_count !=3 && potential_year_count !=1){
+            if(potential_year_count != 6 && potential_year_count !=3 && potential_year_count !=1 && potential_year_count !=4){      //除了(1990) (3) (12) 无括号
                 error_name.add(filename);
                 continue;
             }
@@ -783,6 +830,9 @@ public class ToolsServiceImpl implements ToolsService {
                         }
                         first_square_bracket = part_list[2].indexOf('(');
                         second_square_bracket = part_list[2].indexOf(')');
+                        if (second_square_bracket < 0) {
+                            second_square_bracket = part_list[2].length();
+                        }
                         part_list[2] = part_list[2].substring(first_square_bracket + 1, second_square_bracket);
                         new_name_str = metadataService.get_tufu_20w_name(part_list[0], part_list[1], part_list[2]);
                         break;

@@ -252,17 +252,33 @@ public class MetadataServiceImpl implements IMetadataService {
             return null;
         }
         // 得到文件名
-        filename = filename.substring(0, filename.lastIndexOf("."));
+        filename = filename.substring(0, filename.lastIndexOf("."));//出去文件名后缀
         filename = get_english_name(filename);
 
         //将(1)(2)(3)(4)转换为<1><2><3><4>,以免和年份混淆
-        if (filename.endsWith("(1)") || filename.endsWith("(2)") || filename.endsWith("(3)") || filename.endsWith("(4)")) {
-            String name1, name2;
-            name1 = filename.substring(0, filename.lastIndexOf('('));
-            name2 = filename.substring(filename.lastIndexOf('('));
-            name2 = name2.replace('(', '<');
-            name2 = name2.replace(')', '>');
-            filename = name1 + name2;
+        if(collection == "BASIC_SCALE_MAP_TWENTY"){
+            int oldCount = filename.length();
+            int newCount = filename.replace("(","").length();
+            if(oldCount - newCount>1){      //20w分幅最后有-(4)会造成干扰
+                if (filename.endsWith("(1)") || filename.endsWith("(2)") || filename.endsWith("(3)") || filename.endsWith("(4)") || filename.endsWith("(5)") || filename.endsWith("(6)")) {
+                    String name1, name2;
+                    name1 = filename.substring(0, filename.lastIndexOf('('));
+                    name2 = filename.substring(filename.lastIndexOf('('));
+                    name2 = name2.replace('(', '<');
+                    name2 = name2.replace(')', '>');
+                    filename = name1 + name2;
+                }
+            }
+        }
+        else {
+            if (filename.endsWith("(1)") || filename.endsWith("(2)") || filename.endsWith("(3)") || filename.endsWith("(4)") || filename.endsWith("(5)") || filename.endsWith("(6)")) {
+                String name1, name2;
+                name1 = filename.substring(0, filename.lastIndexOf('('));
+                name2 = filename.substring(filename.lastIndexOf('('));
+                name2 = name2.replace('(', '<');
+                name2 = name2.replace(')', '>');
+                filename = name1 + name2;
+            }
         }
 
         String name_without_year;
@@ -271,6 +287,9 @@ public class MetadataServiceImpl implements IMetadataService {
         int first_brace = filename.lastIndexOf('(');      //找到从右到左第一个左括号，认为前面是图幅，后面是年份
         int second_brace = filename.lastIndexOf(')');     //找到从右到左第一个右括号，认为前面是年份
         int potential_year_count = second_brace - first_brace + 1;
+        if(potential_year_count != 6 && potential_year_count !=3 && potential_year_count !=1 && potential_year_count !=4){      //除了(1990) (3) (12) 无括号
+            return null;
+        }
         if (first_brace != -1 && potential_year_count == 6) {       //存在时间
             name_without_year = filename.substring(0, first_brace);    //图幅编号，不包含(1)(2)
             name_after_year = filename.substring(first_brace);    //除了图幅之外的，年份名称，有可能有(1)(2)之类的
@@ -572,6 +591,7 @@ public class MetadataServiceImpl implements IMetadataService {
 //                }
                 return null;
             }
+
             else {  //跟原图幅编号+年份的匹配
                 int frequency = Collections.frequency(Database_name, formatFilename);
 
@@ -581,26 +601,26 @@ public class MetadataServiceImpl implements IMetadataService {
                     return null;
                 }
             }
-
-            // if (count == 1){
-            //     return maps.get(index);
-            // } else {
-            //     return null;
-            // }
-
         }
         //进行数据库的匹配
-       else {
-
-           // 先匹配 原图幅编号+年份 这一列
-           List<JSONObject> list = metadataDao.findMetadataByOriginalNumAndYear(formatFilename, collection);
-           if (list.size() == 1)
-               return list.get(0);
-           // 再匹配 原图幅编号这一列
-           List<JSONObject> list1 = metadataDao.findMetadataByOriginalNum(formatFilename, collection);
-           if (list1.size() == 1)
-               return list1.get(0);
-       }
-        return null;
+        else {
+            // 先匹配 原图幅编号+年份 这一列
+            List<JSONObject> list = metadataDao.findMetadataByOriginalNumAndYear(formatFilename,collection);
+            if (list.size() == 1)
+                return list.get(0);
+            // 再匹配 原图幅编号这一列
+            List<JSONObject> list1 = metadataDao.findMetadataByOriginalNum(formatFilename,collection);
+            if (list1.size() == 1)
+                return list1.get(0);
+            //匹配<>的情况
+            if (formatFilename.indexOf('<') > 0){
+                String name_without_idx;
+                name_without_idx = formatFilename.substring(0, formatFilename.indexOf('<'));
+                List<JSONObject> list2 = metadataDao.findMetadataByOriginalNumAndYear(formatFilename,collection);
+                if (list2.size() == 1)
+                return list.get(0);
+            }
+            return null;
+        }
     }
 }
