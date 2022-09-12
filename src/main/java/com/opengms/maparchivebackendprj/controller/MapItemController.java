@@ -244,6 +244,19 @@ public class MapItemController {
 
     }
 
+    @ApiOperation(value = "得到需要重新匹配的列表" )
+    @RequestMapping(value = "/process/match/content", method = RequestMethod.POST)
+    public JsonResult getProcessingListNeedMatch(@RequestBody SpecificFindDTO findDTO){
+
+        if (!genericService.checkFindDTOParams(findDTO)){
+            return ResultUtils.error("参数错误");
+        }
+
+        List<StatusEnum> statusEnums = Arrays.asList(StatusEnum.Finished);
+        return mapItemService.getProcessingListNeedMatch(findDTO,statusEnums);
+
+    }
+
     @ApiOperation(value = "得到失败的处理列表" )
     @RequestMapping(value = "/process/error/content", method = RequestMethod.POST)
     public JsonResult getProcessingListStatusIsError(@RequestBody SpecificFindDTO findDTO){
@@ -297,6 +310,19 @@ public class MapItemController {
 
     }
 
+    @ApiOperation(value = "得到需要重新匹配的列表数量" )
+    @RequestMapping(value = "/process/match/count", method = RequestMethod.POST)
+    public JsonResult countProcessingListNeedMatch(@RequestBody SpecificFindDTO findDTO){
+
+        if (!genericService.checkFindDTOParams(findDTO)){
+            return ResultUtils.error("参数错误");
+        }
+
+        List<StatusEnum> statusEnums = Arrays.asList(StatusEnum.Finished);
+        return mapItemService.countProcessingListNeedMatch(findDTO,statusEnums);
+
+    }
+
     @ApiOperation(value = "得到失败的处理列表数量" )
     @RequestMapping(value = "/process/error/count", method = RequestMethod.POST)
     public JsonResult countProcessingListStatusIsError(@RequestBody SpecificFindDTO findDTO){
@@ -325,7 +351,23 @@ public class MapItemController {
         mapItemService.batchProcess(processDTO,user.getName());
 
         return ResultUtils.success();
+    }
 
+    @UserLoginToken
+    @ApiOperation(value = "批量处理匹配失败图片 默认按照创建时间倒序排序" , notes = "@UserLoginToken")
+    @RequestMapping(value = "/process/matchErrorBatch", method = RequestMethod.POST)
+    public JsonResult matchErrorProcess(@RequestBody BatchProcessDTO processDTO, HttpServletRequest request){
+
+        log.info("request /mapItem/matchErrorBatch");
+
+        User user = userService.getUserByToken(request);
+        if (user == null){
+            return ResultUtils.error("用户验证失败");
+        }
+
+        mapItemService.matchErrorProcess(processDTO,user.getName());
+
+        return ResultUtils.success();
     }
 
     @ApiOperation(value = "检查待下载的文件是否存在" )

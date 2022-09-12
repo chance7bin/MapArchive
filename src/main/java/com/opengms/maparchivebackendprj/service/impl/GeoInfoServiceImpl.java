@@ -366,6 +366,7 @@ public class GeoInfoServiceImpl implements IGeoInfoService {
 
     private GeoInfo getCoordinate2Dot5w(String filename){
 
+        //以下情况都要考虑日期
         // X-Y-Z-W-U (Z: 001-144; W: A, B, C, D; U: 1-4)
         // 08-51-053-A-1
         // 08-51-053-A-1.3
@@ -382,15 +383,14 @@ public class GeoInfoServiceImpl implements IGeoInfoService {
 
         ScaleCoordinate coordinate = new ScaleCoordinate();
 
-        if (split.length == 1){
+        if (split.length == 2){
 
-            String[] split1 = filename.split("-");
-
+            String[] split1 = split[0].split("-");
             if (split1.length == 1){
-                // 旌德县(4)
+                // 旌德县(4).1954
                 return null;
             } else {
-                // 08-51-053-A-1
+                //13-50-118-B-4.1965
                 double X = Double.valueOf(split1[0]);
                 double Y = Double.valueOf(split1[1]);
                 String z = split1[2];
@@ -401,13 +401,13 @@ public class GeoInfoServiceImpl implements IGeoInfoService {
             }
 
 
-        } else if (split.length == 2){
+        } else if (split.length == 3){
 
             String[] split0 = split[0].split("-");
             String[] split1 = split[1].split("-");
 
             if (split1.length == 1){
-                // 08-51-053-A-1.3
+                // 08-51-053-A-1.3.1954
                 double X = Double.valueOf(split0[0]);
                 double Y = Double.valueOf(split0[1]);
                 String z = split0[2];
@@ -420,7 +420,7 @@ public class GeoInfoServiceImpl implements IGeoInfoService {
                 coordinate = get2MapCoordinate(coordinate1,coordinate2);
 
             } else if (split1.length == 2){
-                // 08-51-053-D-1.C-2
+                // 08-51-053-D-1.C-2.1954
                 double X = Double.valueOf(split0[0]);
                 double Y = Double.valueOf(split0[1]);
                 String z = split0[2];
@@ -433,7 +433,7 @@ public class GeoInfoServiceImpl implements IGeoInfoService {
                 coordinate = get2MapCoordinate(coordinate1,coordinate2);
 
             } else if (split1.length == 3){
-                // 13-50-091-B-2.079-D-4
+                // 13-50-091-B-2.079-D-4.1954
                 double X = Double.valueOf(split0[0]);
                 double Y = Double.valueOf(split0[1]);
                 String z1 = split0[2];

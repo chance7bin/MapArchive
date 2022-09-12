@@ -177,7 +177,7 @@ public class GenericServiceImpl implements IGenericService {
             log.info("start generate thumbnail, path:{}",outputPath);
             //生成缩略图(输出路径的父文件必须存在)
             Thumbnails.of(inputPath)
-                .size(200, 200)
+                .size(2000, 2000)
                 .toFile(outputPath);
 
 

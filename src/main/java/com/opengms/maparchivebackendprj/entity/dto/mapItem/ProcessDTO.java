@@ -25,7 +25,7 @@ public class ProcessDTO {
     // @ApiModelProperty(value = "分类id", example = "67320f65-8f84-4588-a3cc-c1804101c34a")
     // String clsId;
 
-    @ApiModelProperty(value = "元数据Excel路径(可选,未填该参数则默认到数据库查)", example = "D:/mapArchiveFiles/DEMO.xls")
+    @ApiModelProperty(value = "(可选,未填该参数则默认到数据元数据Excel路径库查)", example = "D:/mapArchiveFiles/DEMO.xls")
     String metadataExcelPath;
     
     // String author;

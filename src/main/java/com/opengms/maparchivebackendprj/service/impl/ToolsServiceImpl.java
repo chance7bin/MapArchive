@@ -145,7 +145,7 @@ public class ToolsServiceImpl implements ToolsService {
             error_part1 += error_part.size();
             a++;
 //            System.out.println(Match_Error);
-            System.out.println(error_name);
+//            System.out.println(error_name);
 
         }
         JSONObject result = new JSONObject();
@@ -196,7 +196,7 @@ public class ToolsServiceImpl implements ToolsService {
                     String name_without_idx;
                     name_without_idx = item.substring(0, item.indexOf('<'));
                     int frequency = Collections.frequency(Database_name, name_without_idx);
-                    if (frequency == 1) {
+                    if (frequency >= 1) { //<>是原图幅和时间都一致的记录，选一个匹配即可
                         Match_OK.add(item);
                         continue;
                     }
@@ -575,6 +575,7 @@ public class ToolsServiceImpl implements ToolsService {
         List<String> Image_name = new ArrayList<>();    //正确的列表
         List<String> error_name = new ArrayList<>();    //错误的文件名 没有文件类型后缀
         List<String> error_part = new ArrayList<>();    //不符合规范的文件名
+        int a = 0;
         for (String filename : filenameList) {
             if (!filename.contains(".")) {    //如果一个.都没有，说明文件名不对
                 error_name.add(filename);
@@ -584,6 +585,8 @@ public class ToolsServiceImpl implements ToolsService {
             filename = filename.substring(0, filename.lastIndexOf('.')); //出去文件名后缀
             filename = get_english_name(filename);
 
+//            System.out.println(a);
+            a++;
             //将(1)(2)(3)(4)转换为<1><2><3><4>,以免和年份混淆
             if(checkScale == "1:20万"){
                 int oldCount = filename.length();
@@ -862,7 +865,7 @@ public class ToolsServiceImpl implements ToolsService {
                 Image_name.add(new_name_str + name_after_year);
             }
         }
-        System.out.println();
+//        System.out.println();
 
         Map<String, List<String>> map = new HashMap<>();
         map.put("Image_name", Image_name);
