@@ -9,11 +9,14 @@ import com.opengms.maparchivebackendprj.dao.IMetadataTableDao;
 import com.opengms.maparchivebackendprj.dao.IMapItemCLSDao;
 import com.opengms.maparchivebackendprj.entity.bo.config.DataServer;
 import com.opengms.maparchivebackendprj.entity.bo.config.DataServerList;
+import com.opengms.maparchivebackendprj.entity.bo.mapItem.GeoInfo;
 import com.opengms.maparchivebackendprj.entity.enums.MapClassification;
 import com.opengms.maparchivebackendprj.entity.po.ClassificationTree;
 import com.opengms.maparchivebackendprj.entity.po.MetadataTable;
 import com.opengms.maparchivebackendprj.entity.po.MapItemCLS;
+import com.opengms.maparchivebackendprj.service.IGeoInfoService;
 import com.opengms.maparchivebackendprj.service.IMapItemService;
+import com.opengms.maparchivebackendprj.service.impl.GeoInfoServiceImpl;
 import com.opengms.maparchivebackendprj.utils.FileUtils;
 import com.opengms.maparchivebackendprj.utils.XmlUtils;
 import org.apache.poi.ss.formula.functions.T;
@@ -353,5 +356,16 @@ class MapArchiveBackendPrjApplicationTests {
         System.out.println();
 
     }
+
+    @Autowired
+    GeoInfoServiceImpl GeoInfoService;
+    @Test
+    void getCoordinate(){
+        String filename = "13-50-118-B-4.1965";
+        String mapcls = "ea07a0e4-642d-46ee-b375-d58fa881f552";
+        GeoInfo cordinate = GeoInfoService.getCoordinate(filename,mapcls);
+        System.out.println(cordinate);
+    }
+
 
 }

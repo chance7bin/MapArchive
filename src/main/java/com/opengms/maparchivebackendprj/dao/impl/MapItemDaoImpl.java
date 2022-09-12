@@ -2,7 +2,6 @@ package com.opengms.maparchivebackendprj.dao.impl;
 
 import com.mongodb.client.result.DeleteResult;
 import com.opengms.maparchivebackendprj.dao.IMapItemDao;
-import com.opengms.maparchivebackendprj.entity.enums.MapClassification;
 import com.opengms.maparchivebackendprj.entity.enums.StatusEnum;
 import com.opengms.maparchivebackendprj.entity.po.MapItem;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +15,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description
@@ -162,11 +162,54 @@ public class MapItemDaoImpl implements IMapItemDao {
     }
 
     @Override
-    public List<MapItem> findByStatusAndHasNeedManual(List<StatusEnum> statusEnums, boolean hasNeedManual, Pageable pageable) {
+    public List<MapItem> findByName(String mapItemName, String mapCLSId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("name").is(mapItemName));
+        query.addCriteria(Criteria.where("mapCLSId").is(mapCLSId));
+        return mongoTemplate.find(query, MapItem.class);
+    }
+
+    @Override
+    public long countByName(String mapItemName, String mapCLSId) {
+        Query query = new Query();
+        query.addCriteria(Criteria.where("name").is(mapItemName));
+        query.addCriteria(Criteria.where("mapCLSId").is(mapCLSId));
+        return mongoTemplate.count(query, MapItem.class);
+    }
+
+
+    @Override
+    public List<MapItem> findByStatusAndHasNeedManual(List<StatusEnum> statusEnums, Map<String,Boolean> batchList, String mapCLSId, boolean hasNeedManual, Pageable pageable) {
 
         Query query = new Query();
+        query.addCriteria(Criteria.where("mapCLSId").is(mapCLSId));
         query.addCriteria(Criteria.where("processStatus").in(statusEnums));
         query.addCriteria(Criteria.where("hasNeedManual").is(hasNeedManual));
+        if(batchList.containsKey("Thumbnail")){
+            query.addCriteria(Criteria.where("thumbnailStatus").is("Inited"));
+        }
+        if(batchList.containsKey("Tiles")){
+            query.addCriteria(Criteria.where("tileStatus").is("Inited"));
+        }
+        if(batchList.containsKey("GeoInfo")){
+            query.addCriteria(Criteria.where("hasCalcCoordinate").is(false));
+        }
+        if(batchList.containsKey("matchMetadata")){
+            query.addCriteria(Criteria.where("hasMatchMetaData").is(false));
+        }
+
+        return mongoTemplate.find(query.with(pageable), MapItem.class);
+
+    }
+
+    @Override
+    public List<MapItem> findByHasNeedMatch(List<StatusEnum> statusEnums, String mapCLSId, boolean hasNeedManual, boolean hasMatchMetaData, Pageable pageable) {
+
+        Query query = new Query();
+        query.addCriteria(Criteria.where("mapCLSId").is(mapCLSId));
+        query.addCriteria(Criteria.where("processStatus").in(statusEnums));
+        query.addCriteria(Criteria.where("hasNeedManual").is(hasNeedManual));
+        query.addCriteria(Criteria.where("hasMatchMetaData").is(hasMatchMetaData));
         return mongoTemplate.find(query.with(pageable), MapItem.class);
 
     }
@@ -174,12 +217,13 @@ public class MapItemDaoImpl implements IMapItemDao {
     @Override
     public List<MapItem> findByStatusAndHasNeedManual(
         String curQueryField, String searchText,
-        List<StatusEnum> statusEnums, boolean hasNeedManual, List<String> clsIdList,Pageable pageable) {
+        List<StatusEnum> statusEnums, boolean hasNeedManual, boolean hasMatchMetaData, List<String> clsIdList,Pageable pageable) {
 
 
         Query query = new Query();
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         query.addCriteria(Criteria.where("hasNeedManual").is(hasNeedManual));
+        query.addCriteria(Criteria.where("hasMatchMetaData").is(hasMatchMetaData));
         query.addCriteria(Criteria.where("processStatus").in(statusEnums));
         if (clsIdList.size() != 0)
             query.addCriteria(Criteria.where("mapCLSId").in(clsIdList));
@@ -215,10 +259,11 @@ public class MapItemDaoImpl implements IMapItemDao {
     @Override
     public long countByStatusAndHasNeedManual(
         String curQueryField, String searchText,
-        List<StatusEnum> statusEnums, boolean hasNeedManual, List<String> clsIdList) {
+        List<StatusEnum> statusEnums, boolean hasNeedManual, boolean hasMatchMetaData, List<String> clsIdList) {
         Query query = new Query();
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         query.addCriteria(Criteria.where("hasNeedManual").is(hasNeedManual));
+        query.addCriteria(Criteria.where("hasMatchMetaData").is(hasMatchMetaData));
         query.addCriteria(Criteria.where("processStatus").in(statusEnums));
         if (clsIdList.size() != 0)
             query.addCriteria(Criteria.where("mapCLSId").in(clsIdList));

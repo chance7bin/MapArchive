@@ -21,6 +21,8 @@ public class BatchProcessDTO {
     boolean generateTiles;
     @ApiModelProperty(value = "处理的数量")
     int processCount;
+    @ApiModelProperty(value = "需要处理的元数据表")
+    String mapCLSId;
 
 
 }

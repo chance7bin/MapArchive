@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.geo.GeoJsonMultiPolygon;
 import org.springframework.data.mongodb.core.geo.GeoJsonPolygon;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Description
@@ -55,15 +56,21 @@ public interface IMapItemDao {
     List<MapItem> findByStatus(List<StatusEnum> statusEnums,Pageable pageable);
     List<MapItem> findByStatus(List<StatusEnum> statusEnums);
 
-    List<MapItem> findByStatusAndHasNeedManual(List<StatusEnum> statusEnums,boolean hasNeedManual,Pageable pageable);
+    List<MapItem> findByName(String mapItemName, String mapCLSId);
 
-    List<MapItem> findByStatusAndHasNeedManual(String curQueryField, String searchText,List<StatusEnum> statusEnums, boolean hasNeedManual, List<String> clsIdList, Pageable pageable);
+    long countByName(String mapItemName, String mapCLSId);
+
+    List<MapItem> findByStatusAndHasNeedManual(List<StatusEnum> statusEnums, Map<String,Boolean> batchList, String mapCLSId, boolean hasNeedManual, Pageable pageable);
+
+    List<MapItem> findByHasNeedMatch(List<StatusEnum> statusEnums, String mapCLSId, boolean hasNeedManual, boolean hasMatchMetaData, Pageable pageable);
+
+    List<MapItem> findByStatusAndHasNeedManual(String curQueryField, String searchText, List<StatusEnum> statusEnums, boolean hasNeedManual, boolean hasMatchMetaData, List<String> clsIdList, Pageable pageable);
 
     List<MapItem> findByHasNeedManual(String curQueryField, String searchText,boolean hasNeedManual, List<String> clsIdList, Pageable pageable);
 
     long countByStatus(String curQueryField, String searchText,List<StatusEnum> statusEnums, List<String> clsIdList);
 
-    long countByStatusAndHasNeedManual(String curQueryField, String searchText,List<StatusEnum> statusEnums, boolean hasNeedManual, List<String> clsIdList);
+    long countByStatusAndHasNeedManual(String curQueryField, String searchText,List<StatusEnum> statusEnums, boolean hasNeedManual, boolean hasMatchMetaData, List<String> clsIdList);
 
     List<MapItem> findAll(Pageable pageable);
 
