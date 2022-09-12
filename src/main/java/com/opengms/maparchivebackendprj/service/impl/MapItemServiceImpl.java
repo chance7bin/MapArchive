@@ -128,7 +128,11 @@ public class MapItemServiceImpl implements IMapItemService {
 
         List<String> itemListId = new ArrayList<>();
         for (File file1 : fileList) {
-
+            String name = file1.getName();
+            long itemCount = mapItemDao.countByName(name, processDTO.getMapCLSId());
+            if(itemCount != 0){
+                continue;
+            }
             //创建实体
             MapItem mapItem = new MapItem();
 
@@ -169,6 +173,11 @@ public class MapItemServiceImpl implements IMapItemService {
         List<FileInfo> fileInfoList = mapItemAddDTO.getFileInfoList();
         if (fileInfoList != null){
             for (FileInfo fileInfo : fileInfoList) {
+                String name = fileInfo.getFileName();
+                long itemCount = mapItemDao.countByName(name, mapItemAddDTO.getMapCLSId());
+                if(itemCount != 0){
+                    return;
+                }
                 // MapItem mapItem = new MapItem();
                 MapItem mapItem = new MapItem();
                 mapItem.setAuthor(username);
@@ -446,6 +455,22 @@ public class MapItemServiceImpl implements IMapItemService {
         ClassificationTree basic = classificationTreeDao.findByVersion("basic");
         return buildClassifications(clsId, basic);
     }
+    public Map<String,Boolean> getItemProcessList(BatchProcessDTO processDTO){
+        Map<String,Boolean> processList = new HashMap<>();
+        if(processDTO.isGenerateThumbnail()){
+            processList.put("Thumbnail",true);
+        }
+        if(processDTO.isGenerateTiles()){
+            processList.put("Tiles",true);
+        }
+        if(processDTO.isCalcGeoInfo()){
+            processList.put("GeoInfo",true);
+        }
+        if(processDTO.isMatchMetadata()){
+            processList.put("matchMetadata",true);
+        }
+        return processList;
+    }
 
     @Override
     public JsonResult updateGeoInfo(String id, MapItemUpdateDTO mapItemUpdateDTO) {
@@ -623,7 +648,7 @@ public class MapItemServiceImpl implements IMapItemService {
 
         List<String> mapClassifications = buildClassifications(findDTO.getMapCLSId());
 
-        List<MapItem> mapItemList = mapItemDao.findByStatusAndHasNeedManual(findDTO.getCurQueryField(),findDTO.getSearchText(),statusEnums, false, mapClassifications,pageable);
+        List<MapItem> mapItemList = mapItemDao.findByStatusAndHasNeedManual(findDTO.getCurQueryField(),findDTO.getSearchText(),statusEnums, false, true, mapClassifications,pageable);
 
         return ResultUtils.success(mapItemList);
 
@@ -637,7 +662,18 @@ public class MapItemServiceImpl implements IMapItemService {
 
         List<String> mapClassifications = buildClassifications(findDTO.getMapCLSId());
 
-        List<MapItem> mapItemList = mapItemDao.findByStatusAndHasNeedManual(findDTO.getCurQueryField(),findDTO.getSearchText(),statusEnums, true, mapClassifications,pageable);
+        List<MapItem> mapItemList = mapItemDao.findByStatusAndHasNeedManual(findDTO.getCurQueryField(),findDTO.getSearchText(),statusEnums, true, true, mapClassifications,pageable);
+        return ResultUtils.success(mapItemList);
+    }
+
+    @Override
+    public JsonResult getProcessingListNeedMatch(SpecificFindDTO findDTO, List<StatusEnum> statusEnums) {
+
+        Pageable pageable = genericService.getPageable(findDTO);
+
+        List<String> mapClassifications = buildClassifications(findDTO.getMapCLSId());
+
+        List<MapItem> mapItemList = mapItemDao.findByStatusAndHasNeedManual(findDTO.getCurQueryField(),findDTO.getSearchText(),statusEnums, true, false, mapClassifications,pageable);
 
         return ResultUtils.success(mapItemList);
 
@@ -667,7 +703,7 @@ public class MapItemServiceImpl implements IMapItemService {
     public JsonResult countProcessingListStatusIsFinished(SpecificFindDTO findDTO, List<StatusEnum> statusEnums) {
         List<String> mapClassifications = buildClassifications(findDTO.getMapCLSId());
 
-        long count = mapItemDao.countByStatusAndHasNeedManual(findDTO.getCurQueryField(),findDTO.getSearchText(),statusEnums, false,mapClassifications);
+        long count = mapItemDao.countByStatusAndHasNeedManual(findDTO.getCurQueryField(),findDTO.getSearchText(),statusEnums, false, true, mapClassifications);
 
         return ResultUtils.success(count);
     }
@@ -676,7 +712,16 @@ public class MapItemServiceImpl implements IMapItemService {
     public JsonResult countProcessingListNeedManual(SpecificFindDTO findDTO, List<StatusEnum> statusEnums) {
         List<String> mapClassifications = buildClassifications(findDTO.getMapCLSId());
 
-        long count = mapItemDao.countByStatusAndHasNeedManual(findDTO.getCurQueryField(),findDTO.getSearchText(),statusEnums, true,mapClassifications);
+        long count = mapItemDao.countByStatusAndHasNeedManual(findDTO.getCurQueryField(),findDTO.getSearchText(),statusEnums, true, true, mapClassifications);
+
+        return ResultUtils.success(count);
+    }
+
+    @Override
+    public JsonResult countProcessingListNeedMatch(SpecificFindDTO findDTO, List<StatusEnum> statusEnums) {
+        List<String> mapClassifications = buildClassifications(findDTO.getMapCLSId());
+
+        long count = mapItemDao.countByStatusAndHasNeedManual(findDTO.getCurQueryField(),findDTO.getSearchText(),statusEnums, true, false, mapClassifications);
 
         return ResultUtils.success(count);
     }
@@ -697,7 +742,33 @@ public class MapItemServiceImpl implements IMapItemService {
 
         Pageable pageable = genericService.getPageable(findDTO);
 
-        List<MapItem> mapItemList = mapItemDao.findByStatusAndHasNeedManual(Arrays.asList(StatusEnum.Finished),true,pageable);
+        Map<String,Boolean> batchList = getItemProcessList(processDTO);
+
+        List<MapItem> mapItemList = mapItemDao.findByStatusAndHasNeedManual(Arrays.asList(StatusEnum.Finished), batchList, processDTO.getMapCLSId(), true, pageable);
+
+        List<String> itemListId = new ArrayList<>();
+
+        for (MapItem mapItem : mapItemList) {
+            mapItem.setProcessStatus(StatusEnum.Inited);
+            mapItemDao.save(mapItem);
+
+            itemListId.add(mapItem.getId());
+
+            asyncService.batchProcess(mapItem,processDTO);
+        }
+
+        logDao.insert(new LogInfo(username,itemListId, OperateTypeEnum.PROCESS,new Date()));
+
+    }
+
+    @Override
+    public void matchErrorProcess(BatchProcessDTO processDTO, String username) {
+
+        FindDTO findDTO = new FindDTO(1,processDTO.getProcessCount(),false,"createTime");
+
+        Pageable pageable = genericService.getPageable(findDTO);
+
+        List<MapItem> mapItemList = mapItemDao.findByHasNeedMatch(Arrays.asList(StatusEnum.Finished), processDTO.getMapCLSId(),true,false,pageable);
 
         List<String> itemListId = new ArrayList<>();
 

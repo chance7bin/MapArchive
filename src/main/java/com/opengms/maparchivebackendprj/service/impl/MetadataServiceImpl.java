@@ -127,10 +127,14 @@ public class MetadataServiceImpl implements IMetadataService {
     }
 
     public static String get_tufu_100w_name(String number1, String number2) {
+        try {
+            int num1 = Integer.parseInt(number1);
+            int num2 = Integer.parseInt(number2);
+            return get_tufu_100w_name(num1,num2);
+        } catch (Exception e) {
+            return null;
+        }
 
-        int num1 = Integer.parseInt(number1);
-        int num2 = Integer.parseInt(number2);
-        return get_tufu_100w_name(num1,num2);
     }
 
     public static String get_tufu_50w_name(int number1, int number2, String number3) {
@@ -143,10 +147,15 @@ public class MetadataServiceImpl implements IMetadataService {
 
     public static String get_tufu_50w_name(String number1, String number2, String number3) {
 
-        int num1 = Integer.parseInt(number1);
-        int num2 = Integer.parseInt(number2);
+        try {
+            int num1 = Integer.parseInt(number1);
+            int num2 = Integer.parseInt(number2);
 
-        return get_tufu_50w_name(num1,num2,number3);
+            return get_tufu_50w_name(num1,num2,number3);
+        } catch (Exception e) {
+            return null;
+        }
+
     }
 
     public static String get_tufu_25w_name(int number1, int number2, int number3) {
@@ -160,11 +169,16 @@ public class MetadataServiceImpl implements IMetadataService {
 
     public static String get_tufu_25w_name(String number1, String number2, String number3) {
 
-        int num1 = Integer.parseInt(number1);
-        int num2 = Integer.parseInt(number2);
-        int num3 = Integer.parseInt(number3);
+        try {
+            int num1 = Integer.parseInt(number1);
+            int num2 = Integer.parseInt(number2);
+            int num3 = Integer.parseInt(number3);
 
-        return get_tufu_25w_name(num1,num2,num3);
+            return get_tufu_25w_name(num1,num2,num3);
+        } catch (Exception e) {
+            return null;
+        }
+
     }
 
     public static String get_tufu_20w_name(int number1, int number2, int number3) {
@@ -178,11 +192,16 @@ public class MetadataServiceImpl implements IMetadataService {
 
     public static String get_tufu_20w_name(String number1, String number2, String number3) {
 
-        int num1 = Integer.parseInt(number1);
-        int num2 = Integer.parseInt(number2);
-        int num3 = Integer.parseInt(number3);
+        try {
+            int num1 = Integer.parseInt(number1);
+            int num2 = Integer.parseInt(number2);
+            int num3 = Integer.parseInt(number3);
 
-        return get_tufu_20w_name(num1,num2,num3);
+            return get_tufu_20w_name(num1,num2,num3);
+        } catch (Exception e) {
+            return null;
+        }
+
     }
 
     public static String get_tufu_10w_name(int number1, int number2, int number3) {
@@ -195,11 +214,16 @@ public class MetadataServiceImpl implements IMetadataService {
 
     public static String get_tufu_10w_name(String number1, String number2, String number3) {
 
-        int num1 = Integer.parseInt(number1);
-        int num2 = Integer.parseInt(number2);
-        int num3 = Integer.parseInt(number3);
+        try {
+            int num1 = Integer.parseInt(number1);
+            int num2 = Integer.parseInt(number2);
+            int num3 = Integer.parseInt(number3);
 
-        return get_tufu_10w_name(num1,num2,num3);
+            return get_tufu_10w_name(num1,num2,num3);
+        } catch (Exception e) {
+            return null;
+        }
+
     }
 
     public static String get_tufu_5w_name(int number1, int number2, int number3, String number4) {
@@ -212,11 +236,16 @@ public class MetadataServiceImpl implements IMetadataService {
 
     public static String get_tufu_5w_name(String number1, String number2, String number3, String number4) {
 
-        int num1 = Integer.parseInt(number1);
-        int num2 = Integer.parseInt(number2);
-        int num3 = Integer.parseInt(number3);
+        try {
+            int num1 = Integer.parseInt(number1);
+            int num2 = Integer.parseInt(number2);
+            int num3 = Integer.parseInt(number3);
 
-        return get_tufu_5w_name(num1,num2,num3,number4);
+            return get_tufu_5w_name(num1,num2,num3,number4);
+        } catch (Exception e) {
+            return null;
+        }
+
     }
 
     public static String get_tufu_2Dot5w_name(int number1, int number2, int number3, String number4, String number5) {
@@ -231,11 +260,16 @@ public class MetadataServiceImpl implements IMetadataService {
 
     public static String get_tufu_2Dot5w_name(String number1, String number2, String number3, String number4, String number5) {
 
-        int num1 = Integer.parseInt(number1);
-        int num2 = Integer.parseInt(number2);
-        int num3 = Integer.parseInt(number3);
+        try {
+            int num1 = Integer.parseInt(number1);
+            int num2 = Integer.parseInt(number2);
+            int num3 = Integer.parseInt(number3);
 
-        return get_tufu_2Dot5w_name(num1,num2,num3,number4,number5);
+            return get_tufu_2Dot5w_name(num1,num2,num3,number4,number5);
+        } catch (Exception e) {
+            return null;
+        }
+
     }
 
     // 通用基础比例尺地图下的元数据匹配
@@ -491,6 +525,10 @@ public class MetadataServiceImpl implements IMetadataService {
                     }
                     first_square_bracket = part_list[2].indexOf('(');
                     second_square_bracket = part_list[2].indexOf(')');
+                    //不需要考虑first_square_bracket = -1，因为+1后还是从0开始切
+                    if(second_square_bracket < 0){
+                        second_square_bracket = part_list[2].length();
+                    }
                     part_list[2] = part_list[2].substring(first_square_bracket + 1, second_square_bracket);
                     new_name_str = get_tufu_20w_name(part_list[0], part_list[1], part_list[2]);
                     break;
@@ -528,6 +566,8 @@ public class MetadataServiceImpl implements IMetadataService {
             List<Map<String, Object>> maps = FileUtils.redExcel(excelPath);
             List<String> Database_name = new ArrayList<>();  //原图幅编号+年份
             List<String> Database_name_block_only = new ArrayList<>(); //原图幅编号
+            Map<String,List<String>> Database_name_year_dict = new HashMap<>();//原图幅号和对应时间的集合
+            Map<String,List<String>> Database_name_style_dict = new HashMap<>();//原图幅号和对应版型的集合
 
 
             int count = 0; //匹配上的次数
@@ -536,10 +576,23 @@ public class MetadataServiceImpl implements IMetadataService {
             for (int j = 0; j < maps.size(); j++) {
                 String code1 = maps.get(j).get("原图幅编号").toString();
                 String code2 = maps.get(j).get("出版时间").toString();
+                String code3 = maps.get(j).get("版型").toString();
 
                 String format1 = code1;
                 String format2 = code1+"("+code2+")";
+                if(Database_name_year_dict.containsKey(code1)){
+                    Database_name_year_dict.get(code1).add(code2);
+                    Database_name_style_dict.get(code1).add(code3);
+                }
+                else{
+                    LinkedList<String> strings1 = new LinkedList<>();
+                    LinkedList<String> strings2 = new LinkedList<>();
+                    strings1.add(code2);
+                    strings2.add(code3);
+                    Database_name_year_dict.put(code1,strings1);
+                    Database_name_style_dict.put(code1,strings2);
 
+                }
                 Database_name.add(format2);
                 Database_name_block_only.add(format1);
 
@@ -554,7 +607,27 @@ public class MetadataServiceImpl implements IMetadataService {
                     int frequency = Collections.frequency(Database_name_block_only, formatFilename);
                     if (frequency == 1){ //只有唯一的才是成功的
                         return maps.get(Database_name_block_only.indexOf(formatFilename));
-                    } else {
+                    }
+                    else {
+                        if(Database_name_year_dict.containsKey(formatFilename)){
+                            List<String> strings = Database_name_year_dict.get(formatFilename);
+                            Set<String> set=new HashSet<>(strings);
+                            if (set.size()==1 && strings.size()>1){ //多个相同的年份
+                                int time1 = Collections.frequency(Database_name_style_dict.get(formatFilename), '纸');
+                                if (time1 == 1){
+                                    int time2 = Database_name_style_dict.get(formatFilename).indexOf('纸');
+                                    int time3 = 0;
+                                    for(int a = 0; a < Database_name_year_dict.size(); a++){
+                                        if(Database_name_block_only.get(a) == formatFilename){
+                                            time3++;
+                                        }
+                                        if(time3 == time2+1){
+                                            return maps.get(a);
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         return null;
                     }
                 }
@@ -562,13 +635,35 @@ public class MetadataServiceImpl implements IMetadataService {
                 if (formatFilename.indexOf('<') > 0){
                     String name_without_idx;
                     name_without_idx = formatFilename.substring(0, formatFilename.indexOf('<'));
+                    int num = Integer.parseInt(formatFilename.substring(formatFilename.indexOf('<')+1,formatFilename.length()-1));
                     int frequency = Collections.frequency(Database_name, name_without_idx);
-                    if (frequency == 1) {
+                    if (frequency == 1) {   //考虑原图幅+时间匹配上的情况
                         return maps.get(Database_name.indexOf(name_without_idx)) ;
+                    }
+                    else if(frequency > 1){
+                        int index1 = 0;
+                        for(int a = 0; a < Database_name.size(); a++){
+                            if (Database_name.get(a) == name_without_idx){
+                                Map<String, Object> item = maps.get(a);
+                                String type = item.get("版型").toString();
+                                if(type == "纸"){    //如果是纸则赋给<1>的图
+                                    if(num == 1){
+                                        return item;
+                                    }
+                                }else {     //不是纸，则赋给不为<1>的图
+                                    if (num != 1){
+                                        return item;
+                                    }
+                                }
+                                index1 = a;
+                            }
+
+                        }
+                        return maps.get(index1);    //  若不满足之前情况，则匹配最新查到的记录
                     }
                     else {
                         return null;
-//                        formatFilename = name_without_idx;      //将其余情况放在下面处理
+//
                     }
                 }
                 //特殊情况二：时间出错，删去时间只对原图幅编号进行匹配
@@ -594,12 +689,25 @@ public class MetadataServiceImpl implements IMetadataService {
 
             else {  //跟原图幅编号+年份的匹配
                 int frequency = Collections.frequency(Database_name, formatFilename);
-
                 if (frequency == 1){
                     return maps.get(Database_name.indexOf(formatFilename));
-                } else {
-                    return null;
                 }
+                else if(frequency > 1){     //同一图幅多个相同时间，没有<>,默认不选纸
+                    int index1 = 0;
+                    for(int a = 0; a < Database_name.size(); a++){  //和带有时间的做对比
+                        if (Database_name.get(a) == formatFilename){
+                            Map<String, Object> item = maps.get(a);
+                            String type = item.get("版型").toString();
+                            if(type != "纸"){    //不是纸，则赋给不为<1>的图
+                                return item;
+                            }
+                            index1 = a;
+                        }
+
+                    }
+                    return maps.get(index1);    //  若不满足之前情况，则匹配最新查到的记录
+                }
+                return null;
             }
         }
         //进行数据库的匹配
@@ -608,17 +716,87 @@ public class MetadataServiceImpl implements IMetadataService {
             List<JSONObject> list = metadataDao.findMetadataByOriginalNumAndYear(formatFilename,collection);
             if (list.size() == 1)
                 return list.get(0);
+            if (list.size() > 1){
+                int index1 = 0;
+                for(int a = 0; a < list.size(); a++){
+                    if (list.get(a).get("版型").toString() != "纸"){
+                        return list.get(a);
+                    }
+                    index1 = a;
+                }
+                return list.get(index1);    //  若不满足之前情况，则匹配最新查到的记录
+            }
             // 再匹配 原图幅编号这一列
             List<JSONObject> list1 = metadataDao.findMetadataByOriginalNum(formatFilename,collection);
             if (list1.size() == 1)
                 return list1.get(0);
+            List<String> strings = new ArrayList<>();
+            for(int a = 0; a < list1.size(); a++){
+                strings.add(list1.get(a).get("出版时间").toString());
+            }
+            Set<String> set=new HashSet<>(strings);
+            int c = list1.size();
+            int d = set.size();
+            if (list1.size() > 1 && set.size() == 1){
+                int index1 = 0;
+                for(int a = 0; a < list1.size(); a++){
+                    if (list1.get(a).get("版型").toString() != "纸"){
+                        return list1.get(a);
+                    }
+                    index1 = a;
+                }
+                return list1.get(index1);    //  若不满足之前情况，则匹配最新查到的记录
+            }
             //匹配<>的情况
             if (formatFilename.indexOf('<') > 0){
                 String name_without_idx;
                 name_without_idx = formatFilename.substring(0, formatFilename.indexOf('<'));
-                List<JSONObject> list2 = metadataDao.findMetadataByOriginalNumAndYear(formatFilename,collection);
-                if (list2.size() == 1)
-                return list.get(0);
+                int num = Integer.parseInt(formatFilename.substring(formatFilename.indexOf('<')+1,formatFilename.length()-1));
+                List<JSONObject> list3 = metadataDao.findMetadataByOriginalNumAndYear(name_without_idx,collection);
+                // 先匹配 原图幅编号+年份 这一列
+                if (list3.size() == 1)
+                    return list3.get(0);
+                if (list3.size() > 1){
+                    int index1 = 0;
+                    for(int a = 0; a < list3.size(); a++){
+                        if(list3.get(a).get("版型").toString() == "纸"){    //如果是纸则赋给<1>的图
+                            if(num == 1){
+                                return list3.get(a);
+                            }
+                        }else {     //不是纸，则赋给不为<1>的图
+                            if (num != 1){
+                                return list3.get(a);
+                            }
+                        }
+                        index1 = a;
+                    }
+                    return list3.get(index1);    //  若不满足之前情况，则匹配最新查到的记录
+                }
+                // 再匹配 原图幅编号这一列
+                List<JSONObject> list4 = metadataDao.findMetadataByOriginalNum(name_without_idx,collection);
+                if (list4.size() == 1)
+                    return list4.get(0);
+                List<String> strings1 = new ArrayList<>();
+                for(int a = 0; a < list4.size(); a++){
+                    strings1.add(list4.get(a).get("出版时间").toString());
+                }
+                Set<String> set1=new HashSet<>(strings1);
+                if (list4.size() > 1 && set1.size() == 1){
+                    int index1 = 0;
+                    for(int a = 0; a < list4.size(); a++){
+                        if(list4.get(a).get("版型").toString() == "纸"){    //如果是纸则赋给<1>的图
+                            if(num == 1){
+                                return list4.get(a);
+                            }
+                        }else {     //不是纸，则赋给不为<1>的图
+                            if (num != 1){
+                                return list4.get(a);
+                            }
+                        }
+                        index1 = a;
+                    }
+                    return list4.get(index1);    //  若不满足之前情况，则匹配最新查到的记录
+                }
             }
             return null;
         }

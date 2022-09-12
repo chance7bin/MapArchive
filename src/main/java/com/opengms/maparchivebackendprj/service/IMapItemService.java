@@ -40,6 +40,8 @@ public interface IMapItemService {
 
     JsonResult getProcessingListNeedManual(SpecificFindDTO findDTO, List<StatusEnum> statusEnums);
 
+    JsonResult getProcessingListNeedMatch(SpecificFindDTO findDTO, List<StatusEnum> statusEnums);
+
     JsonResult getProcessingListStatusIsError(SpecificFindDTO findDTO, List<StatusEnum> statusEnums);
 
     JsonResult countProcessingListStatusIsProcessing(SpecificFindDTO findDTO, List<StatusEnum> statusEnums);
@@ -48,10 +50,14 @@ public interface IMapItemService {
 
     JsonResult countProcessingListNeedManual(SpecificFindDTO findDTO, List<StatusEnum> statusEnums);
 
+    JsonResult countProcessingListNeedMatch(SpecificFindDTO findDTO, List<StatusEnum> statusEnums);
+
     JsonResult countProcessingListStatusIsError(SpecificFindDTO findDTO, List<StatusEnum> statusEnums);
 
 
     void batchProcess(BatchProcessDTO processDTO, String username);
+
+    void matchErrorProcess(BatchProcessDTO processDTO, String username);
 
     JsonResult checkFileExist(String mapItemId);
 
