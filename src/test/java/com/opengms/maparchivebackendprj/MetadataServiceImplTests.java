@@ -18,8 +18,8 @@ public class MetadataServiceImplTests {
     IMetadataDao metadataDao;
     @Test
     void getBSMMetadata() {
-        String filename = "06-47-07.tif";
-        String clsNameCn = "BASIC_SCALE_MAP_TWENTY";
+        String filename = "05-48-008-A-1(1958).tif";
+        String clsNameCn = "BASIC_SCALE_MAP_TWO_DOT_FIVE";
         String excelPath = "";
         Map map = null;
         try {

@@ -182,20 +182,16 @@ public class MapItemDaoImpl implements IMapItemDao {
     public List<MapItem> findByStatusAndHasNeedManual(List<StatusEnum> statusEnums, Map<String,Boolean> batchList, String mapCLSId, boolean hasNeedManual, Pageable pageable) {
 
         Query query = new Query();
-        query.addCriteria(Criteria.where("mapCLSId").is(mapCLSId));
+        if(!mapCLSId.equals("")){
+            query.addCriteria(Criteria.where("mapCLSId").is(mapCLSId));
+        }
         query.addCriteria(Criteria.where("processStatus").in(statusEnums));
         query.addCriteria(Criteria.where("hasNeedManual").is(hasNeedManual));
-        if(batchList.containsKey("Thumbnail")){
-            query.addCriteria(Criteria.where("thumbnailStatus").is("Inited"));
-        }
-        if(batchList.containsKey("Tiles")){
-            query.addCriteria(Criteria.where("tileStatus").is("Inited"));
-        }
         if(batchList.containsKey("GeoInfo")){
-            query.addCriteria(Criteria.where("hasCalcCoordinate").is(false));
+            query.addCriteria(Criteria.where("hasCalcCoordinate").is(true));
         }
         if(batchList.containsKey("matchMetadata")){
-            query.addCriteria(Criteria.where("hasMatchMetaData").is(false));
+            query.addCriteria(Criteria.where("hasMatchMetaData").is(true));
         }
 
         return mongoTemplate.find(query.with(pageable), MapItem.class);
@@ -206,7 +202,9 @@ public class MapItemDaoImpl implements IMapItemDao {
     public List<MapItem> findByHasNeedMatch(List<StatusEnum> statusEnums, String mapCLSId, boolean hasNeedManual, boolean hasMatchMetaData, Pageable pageable) {
 
         Query query = new Query();
-        query.addCriteria(Criteria.where("mapCLSId").is(mapCLSId));
+        if(!mapCLSId.equals("")){
+            query.addCriteria(Criteria.where("mapCLSId").is(mapCLSId));
+        }
         query.addCriteria(Criteria.where("processStatus").in(statusEnums));
         query.addCriteria(Criteria.where("hasNeedManual").is(hasNeedManual));
         query.addCriteria(Criteria.where("hasMatchMetaData").is(hasMatchMetaData));
