@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -75,7 +76,9 @@ public class LogServiceImpl implements ILogService {
 
             jsonObject.put("operator",logInfo.getOperator());
             jsonObject.put("operateType",logInfo.getOperateType());
-            jsonObject.put("createTime",logInfo.getCreateTime());
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            jsonObject.put("createTime", simpleDateFormat.format(logInfo.getCreateTime()));
+//            jsonObject.put("createTime",logInfo.getCreateTime());
             jsonObject.put("itemList",items);
 
             result.add(jsonObject);
