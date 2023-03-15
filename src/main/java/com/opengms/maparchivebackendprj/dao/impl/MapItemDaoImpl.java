@@ -51,6 +51,10 @@ public class MapItemDaoImpl implements IMapItemDao {
 
         Query query = new Query();
         // query.addCriteria(Criteria.where("box").within(box));
+        // 模糊查询‘()’和‘[]’等特殊字符要加'\'转义
+        searchText = searchText.replaceAll("\\[","\\\\[").replaceAll("\\]","\\\\]");
+        searchText = searchText.replaceAll("\\(","\\\\(").replaceAll("\\)","\\\\)");
+
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         query.addCriteria(Criteria.where("polygon").intersects(polygon));
         if (clsIdList.size() != 0)
@@ -65,6 +69,10 @@ public class MapItemDaoImpl implements IMapItemDao {
         Box box, List<String> clsIdList, Pageable pageable) {
 
         Query query = new Query();
+        // 模糊查询‘()’和‘[]’等特殊字符要加'\'转义
+        searchText = searchText.replaceAll("\\[","\\\\[").replaceAll("\\]","\\\\]");
+        searchText = searchText.replaceAll("\\(","\\\\(").replaceAll("\\)","\\\\)");
+
         query.addCriteria(Criteria.where("box").within(box));
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         if (clsIdList.size() != 0)
@@ -78,6 +86,10 @@ public class MapItemDaoImpl implements IMapItemDao {
         String curQueryField, String searchText,
         GeoJsonMultiPolygon polygon, List<String> clsIdList, Pageable pageable) {
         Query query = new Query();
+        // 模糊查询‘()’和‘[]’等特殊字符要加'\'转义
+        searchText = searchText.replaceAll("\\[","\\\\[").replaceAll("\\]","\\\\]");
+        searchText = searchText.replaceAll("\\(","\\\\(").replaceAll("\\)","\\\\)");
+
         // query.addCriteria(Criteria.where("box").within(box));
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         query.addCriteria(Criteria.where("polygon").intersects(polygon));
@@ -92,6 +104,10 @@ public class MapItemDaoImpl implements IMapItemDao {
         String curQueryField, String searchText,
         GeoJsonPolygon polygon, List<String> clsIdList) {
         Query query = new Query();
+        // 模糊查询‘()’和‘[]’等特殊字符要加'\'转义
+        searchText = searchText.replaceAll("\\[","\\\\[").replaceAll("\\]","\\\\]");
+        searchText = searchText.replaceAll("\\(","\\\\(").replaceAll("\\)","\\\\)");
+
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         query.addCriteria(Criteria.where("polygon").intersects(polygon));
         if (clsIdList.size() != 0)
@@ -104,6 +120,10 @@ public class MapItemDaoImpl implements IMapItemDao {
         String curQueryField, String searchText,
         GeoJsonMultiPolygon polygon, List<String> clsIdList) {
         Query query = new Query();
+        // 模糊查询‘()’和‘[]’等特殊字符要加'\'转义
+        searchText = searchText.replaceAll("\\[","\\\\[").replaceAll("\\]","\\\\]");
+        searchText = searchText.replaceAll("\\(","\\\\(").replaceAll("\\)","\\\\)");
+
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         query.addCriteria(Criteria.where("polygon").intersects(polygon));
         if (clsIdList.size() != 0)
@@ -115,6 +135,9 @@ public class MapItemDaoImpl implements IMapItemDao {
     public List<MapItem> findBySearchTextAndPageable(String curQueryField, String searchText, List<String> clsIdList, Pageable pageable) {
 
         Query query = new Query();
+        // 模糊查询‘()’和‘[]’等特殊字符要加'\'转义
+        searchText = searchText.replaceAll("\\[","\\\\[").replaceAll("\\]","\\\\]");
+        searchText = searchText.replaceAll("\\(","\\\\(").replaceAll("\\)","\\\\)");
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         if (clsIdList.size() != 0)
             query.addCriteria(Criteria.where("mapCLSId").in(clsIdList));
@@ -128,6 +151,10 @@ public class MapItemDaoImpl implements IMapItemDao {
     public long countBySearchText(String curQueryField, String searchText, List<String> clsIdList) {
 
         Query query = new Query();
+        // 模糊查询‘()’和‘[]’等特殊字符要加'\'转义
+        searchText = searchText.replaceAll("\\[","\\\\[").replaceAll("\\]","\\\\]");
+        searchText = searchText.replaceAll("\\(","\\\\(").replaceAll("\\)","\\\\)");
+
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         if (clsIdList.size() != 0)
             query.addCriteria(Criteria.where("mapCLSId").in(clsIdList));
@@ -139,6 +166,10 @@ public class MapItemDaoImpl implements IMapItemDao {
     @Override
     public List<MapItem> findBySearchTextAndStatus(String curQueryField, String searchText, List<StatusEnum> statusEnums, List<String> clsIdList, Pageable pageable) {
         Query query = new Query();
+        // 模糊查询‘()’和‘[]’等特殊字符要加'\'转义
+        searchText = searchText.replaceAll("\\[","\\\\[").replaceAll("\\]","\\\\]");
+        searchText = searchText.replaceAll("\\(","\\\\(").replaceAll("\\)","\\\\)");
+
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         query.addCriteria(Criteria.where("processStatus").in(statusEnums));
         if (clsIdList.size() != 0)
@@ -219,6 +250,10 @@ public class MapItemDaoImpl implements IMapItemDao {
 
 
         Query query = new Query();
+        // 模糊查询‘()’和‘[]’等特殊字符要加'\'转义
+        searchText = searchText.replaceAll("\\[","\\\\[").replaceAll("\\]","\\\\]");
+        searchText = searchText.replaceAll("\\(","\\\\(").replaceAll("\\)","\\\\)");
+
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         query.addCriteria(Criteria.where("hasNeedManual").is(hasNeedManual));
         query.addCriteria(Criteria.where("hasMatchMetaData").is(hasMatchMetaData));
@@ -235,6 +270,10 @@ public class MapItemDaoImpl implements IMapItemDao {
         boolean hasNeedManual, List<String> clsIdList, Pageable pageable) {
 
         Query query = new Query();
+        // 模糊查询‘()’和‘[]’等特殊字符要加'\'转义
+        searchText = searchText.replaceAll("\\[","\\\\[").replaceAll("\\]","\\\\]");
+        searchText = searchText.replaceAll("\\(","\\\\(").replaceAll("\\)","\\\\)");
+
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         query.addCriteria(Criteria.where("hasNeedManual").is(hasNeedManual));
         if (clsIdList.size() != 0)
@@ -247,6 +286,10 @@ public class MapItemDaoImpl implements IMapItemDao {
         String curQueryField, String searchText,
         List<StatusEnum> statusEnums,  List<String> clsIdList) {
         Query query = new Query();
+        // 模糊查询‘()’和‘[]’等特殊字符要加'\'转义
+        searchText = searchText.replaceAll("\\[","\\\\[").replaceAll("\\]","\\\\]");
+        searchText = searchText.replaceAll("\\(","\\\\(").replaceAll("\\)","\\\\)");
+
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         query.addCriteria(Criteria.where("processStatus").in(statusEnums));
         if (clsIdList.size() != 0)
@@ -259,6 +302,10 @@ public class MapItemDaoImpl implements IMapItemDao {
         String curQueryField, String searchText,
         List<StatusEnum> statusEnums, boolean hasNeedManual, boolean hasMatchMetaData, List<String> clsIdList) {
         Query query = new Query();
+        // 模糊查询‘()’和‘[]’等特殊字符要加'\'转义
+        searchText = searchText.replaceAll("\\[","\\\\[").replaceAll("\\]","\\\\]");
+        searchText = searchText.replaceAll("\\(","\\\\(").replaceAll("\\)","\\\\)");
+
         query.addCriteria(Criteria.where(curQueryField).regex(searchText));
         query.addCriteria(Criteria.where("hasNeedManual").is(hasNeedManual));
         query.addCriteria(Criteria.where("hasMatchMetaData").is(hasMatchMetaData));

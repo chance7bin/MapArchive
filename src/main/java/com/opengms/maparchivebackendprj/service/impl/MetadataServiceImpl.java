@@ -272,6 +272,50 @@ public class MetadataServiceImpl implements IMetadataService {
 
     }
 
+    public static String get_tufu_1w_name(int number1, int number2, int number3, String number4, String number5, String number6) {
+
+        String X = leftPad(2,number1);
+        String Y = leftPad(2,number2);
+        String Z = leftPad(3,number3);
+        return   X + "-" + Y + "-" + Z + "-" + number4 + "-" + number5 + "-" + number6;
+    }
+
+    public static String get_tufu_1w_name(String number1, String number2, String number3, String number4, String number5, String number6) {
+
+        try {
+            int num1 = Integer.parseInt(number1);
+            int num2 = Integer.parseInt(number2);
+            int num3 = Integer.parseInt(number3);
+
+            return get_tufu_1w_name(num1,num2,num3,number4,number5,number6);
+        } catch (Exception e) {
+            return null;
+        }
+
+    }
+
+    public static String get_tufu_2500_name(int number1, int number2, int number3, String number4, String number5, String number6, String number7, String number8) {
+
+        String X = leftPad(2,number1);
+        String Y = leftPad(2,number2);
+        String Z = leftPad(3,number3);
+        return   X + "-" + Y + "-" + Z + "-" + number4 + "-" + number5 + "-" + number6 + "-" + number7 + "-" + number8;
+    }
+
+    public static String get_tufu_2500_name(String number1, String number2, String number3, String number4, String number5, String number6, String number7, String number8) {
+
+        try {
+            int num1 = Integer.parseInt(number1);
+            int num2 = Integer.parseInt(number2);
+            int num3 = Integer.parseInt(number3);
+
+            return get_tufu_2500_name(num1,num2,num3,number4,number5,number6,number7,number8);
+        } catch (Exception e) {
+            return null;
+        }
+
+    }
+
     // 通用基础比例尺地图下的元数据匹配
     public Map<String, Object> getBSMMetadata(String filename, String collection, String excelPath) throws Exception {
         List<String> scaleArr = Arrays.asList("BASIC_SCALE_MAP_TWO_DOT_FIVE","BASIC_SCALE_MAP_FIVE","BASIC_SCALE_MAP_TEN","BASIC_SCALE_MAP_TWENTY","BASIC_SCALE_MAP_TWENTY_FIVE","BASIC_SCALE_MAP_FIFTY","BASIC_SCALE_MAP_HUNDRED");
