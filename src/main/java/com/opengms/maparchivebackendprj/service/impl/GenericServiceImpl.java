@@ -115,7 +115,7 @@ public class GenericServiceImpl implements IGenericService {
     public MapItem matchMetadata(MapItem mapItem, String mapCLSId, String metadataExcelPath) {
         Map<String, Object> metadataByName = null;
         try {
-            metadataByName = metadataService.getMetadataByFilenameByType(mapItem.getName(), mapCLSId, metadataExcelPath);
+            metadataByName = metadataService.getMetadataByFilenameByType(mapItem.getName(), mapCLSId, mapItem.getMapType(), metadataExcelPath);
         }catch (Exception e){
             mapItem.setHasMatchMetaData(false);
             return mapItem;

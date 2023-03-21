@@ -26,6 +26,7 @@ public class MapItem extends GenericItem {
 
     ImageUrl imageUrl = new ImageUrl();  //图片存放的相对路径
     String relativeFileId; //该地图关联的文件id,用于下载以及删除关联文件
+    String mapType;     // 同一地种类下地图细分匹配，如基本比例尺中有（地形图、协同图、联合作战图）
 
     // StatusEnum copyStatus = StatusEnum.Inited;  //复制文件的进程
     StatusEnum thumbnailStatus = StatusEnum.Inited;  //生成缩略图的进程

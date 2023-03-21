@@ -24,10 +24,10 @@ public interface IMetadataDao {
     // long countMetadataBySearchText(String curQueryField, String searchText, MapClassification mapCLS);
 
     // 文件名和原图幅编号匹配
-    List<JSONObject> findMetadataByOriginalNum(String filename, String collection);
+    List<JSONObject> findMetadataByOriginalNum(String mapType, String matchField, String filename, String collection);
 
     // 文件名和(原图幅编号+年份)匹配
-    List<JSONObject> findMetadataByOriginalNumAndYear(String filename, String collection);
+    List<JSONObject> findMetadataByOriginalNumAndYear(String mapType, String matchFieldAndYear, String filename, String collection);
 
     List<JSONObject> findMetadataBySearchText(String curQueryField, String searchText, String collection, Pageable pageable);
 
