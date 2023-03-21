@@ -58,16 +58,22 @@ public class MetadataDaoImpl implements IMetadataDao {
     // }
 
     @Override
-    public List<JSONObject> findMetadataByOriginalNum(String filename, String collection) {
+    public List<JSONObject> findMetadataByOriginalNum(String mapType, String matchField, String filename, String collection) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("原图幅编号").is(filename));
+        if (!mapType.equals("")){       // 基本比例尺中的地形图，联合作战图，协同图
+            query.addCriteria(Criteria.where("地图种类").is(mapType));
+        }
+        query.addCriteria(Criteria.where(matchField).is(filename));
         return mongoTemplate.find(query, JSONObject.class, collection);
     }
 
     @Override
-    public List<JSONObject> findMetadataByOriginalNumAndYear(String filename, String collection) {
+    public List<JSONObject> findMetadataByOriginalNumAndYear(String mapType, String matchFieldAndYear, String filename, String collection) {
         Query query = new Query();
-        query.addCriteria(Criteria.where("numAndYear").is(filename));
+        if (!mapType.equals("")){       // 基本比例尺中的地形图，联合作战图，协同图
+            query.addCriteria(Criteria.where("地图种类").is(mapType));
+        }
+        query.addCriteria(Criteria.where(matchFieldAndYear).is(filename));
         return mongoTemplate.find(query, JSONObject.class, collection);
     }
 

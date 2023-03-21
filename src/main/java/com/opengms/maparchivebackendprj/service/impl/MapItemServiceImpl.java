@@ -171,18 +171,24 @@ public class MapItemServiceImpl implements IMapItemService {
         // List<MapItem> mapItemList = new ArrayList<>();
         List<String> itemListId = new ArrayList<>();
         List<FileInfo> fileInfoList = mapItemAddDTO.getFileInfoList();
+        String mapType = mapItemAddDTO.getMapType();
         if (fileInfoList != null){
             for (FileInfo fileInfo : fileInfoList) {
                 String name = fileInfo.getFileName();
                 long itemCount = mapItemDao.countByName(name, mapItemAddDTO.getMapCLSId());
+                // 查询名字，重复的不上传
                 if(itemCount != 0){
-                    return;
+                    // 但基本比例尺的航空图，联合作战图除外, 因为和地形图都属于基本比例尺地图，可能有地形图匹配了航空图或联合作战图
+                    if(mapType != "航空图" && mapType != "联合作战图"){
+                        return;
+                    }
                 }
                 // MapItem mapItem = new MapItem();
                 MapItem mapItem = new MapItem();
                 mapItem.setAuthor(username);
                 mapItem.setName(fileInfo.getFileName());
                 mapItem.setMapCLSId(mapItemAddDTO.getMapCLSId());
+                mapItem.setMapType(mapType);
                 mapItemDao.insert(mapItem);
 
                 itemListId.add(mapItem.getId());

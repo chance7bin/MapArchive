@@ -26,9 +26,10 @@ public class MetadataServiceImplTests {
         String filename = "05-48-008-A-1(1958).tif";
         String clsNameCn = "BASIC_SCALE_MAP_TWO_DOT_FIVE";
         String excelPath = "";
+        String mapType = "";
         Map map = null;
         try {
-            map = metadataService.getBSMMetadata(filename, clsNameCn, excelPath);
+            map = metadataService.getBSMMetadata(filename, clsNameCn, mapType, excelPath);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -40,7 +41,7 @@ public class MetadataServiceImplTests {
     void findMetadataByOriginalNumAndYear(){
         String filename = "02-47-070(1965)";
         String collection = "BASIC_SCALE_MAP_TEN";
-        List<JSONObject> list1 = metadataDao.findMetadataByOriginalNum(filename,collection);
+        List<JSONObject> list1 = metadataDao.findMetadataByOriginalNum("地形图","原图幅编号",filename,collection);
         System.out.println(list1);
     }
 
@@ -48,7 +49,7 @@ public class MetadataServiceImplTests {
     void findMetadataByOriginalNum(){
         String filename = "14-52-133";
         String collection = "BASIC_SCALE_MAP_TEN";
-        List<JSONObject> list1 = metadataDao.findMetadataByOriginalNum(filename,collection);
+        List<JSONObject> list1 = metadataDao.findMetadataByOriginalNum("地形图","numAndYear",filename,collection);
         System.out.println(list1);
     }
     @Autowired

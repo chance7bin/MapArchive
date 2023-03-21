@@ -22,11 +22,13 @@ public interface IMetadataService {
      * @return java.util.List<java.lang.String>
      * @Author bin
      **/
-    Map<String, Object> getMetadataByFilenameByType(String filename, String mapCLSId, String excelPath);
+    Map<String, Object> getMetadataByFilenameByType(String filename, String mapCLSId, String mapType, String excelPath);
 
     JsonResult getMetadataByExcel(ExcelPathDTO excelPathDTO);
 
     JsonResult getMetadata(SpecificFindDTO findDTO, String collection);
 
     JsonResult countMetadata(SpecificFindDTO findDTO, String collection);
+
+    String get_english_name(String filename);
 }

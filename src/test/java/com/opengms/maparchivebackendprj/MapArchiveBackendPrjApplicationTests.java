@@ -340,7 +340,7 @@ class MapArchiveBackendPrjApplicationTests {
         // String formatFilename = "14-52-134(1966)";
         String formatFilename = "14-52-133";
         // List<JSONObject> list = metadataDao.findMetadataByOriginalNumAndYear(collection, formatFilename);
-        List<JSONObject> list = metadataDao.findMetadataByOriginalNum(formatFilename, collection);
+        List<JSONObject> list = metadataDao.findMetadataByOriginalNum("地形图","numAndYear",formatFilename, collection);
 
         System.out.println();
 
