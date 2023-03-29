@@ -64,7 +64,7 @@ public class ToolsServiceImplTests {
             String filename = (String) e;
             Map<String, Object> map = null;
             try {
-                map = metadataServiceImpl.getBSMMetadata(filename,"BASIC_SCALE_MAP_ONE","地形图", null);
+                map = metadataServiceImpl.getBSMMetadata(filename,"BASIC_SCALE_MAP_FIFTY","地形图", null);
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
@@ -77,7 +77,7 @@ public class ToolsServiceImplTests {
 
     @Test
     void test2() throws Exception {
-        Map<String, Object> map = metadataServiceImpl.getBSMMetadata("06-49-060-C-3-(3).tif","BASIC_SCALE_MAP_ONE","地形图",null);
+        Map<String, Object> map = metadataServiceImpl.getBSMMetadata("05-49-A.B.tif","BASIC_SCALE_MAP_FIFTY","",null);
         System.out.print(map);
     }
 }
