@@ -22,6 +22,8 @@ public class ProcessDTO {
 //    String savePath; //保存路径根据分类自动生成
     @ApiModelProperty(value = "地图目录树对应的id", example = "87086982-5ab1-473e-a65c-c010958f3ef3")
     String mapCLSId; //地图分类
+    @ApiModelProperty(value = "对地图的描述", example = "地形图")
+    String mapType; // 同一类型地图明细备注，例如基本比例尺中（地形图、航空图、联合作战图），其他图暂时为“”
     // @ApiModelProperty(value = "分类id", example = "67320f65-8f84-4588-a3cc-c1804101c34a")
     // String clsId;
 

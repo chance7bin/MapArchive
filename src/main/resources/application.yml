@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: win
   mvc:
     static-path-pattern: /static/**
     pathmatch:

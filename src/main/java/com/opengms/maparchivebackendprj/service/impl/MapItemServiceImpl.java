@@ -126,12 +126,16 @@ public class MapItemServiceImpl implements IMapItemService {
             fileList.addAll(getFileList(f));
         }
 
+        String mapType = processDTO.getMapType();
         List<String> itemListId = new ArrayList<>();
         for (File file1 : fileList) {
             String name = file1.getName();
             long itemCount = mapItemDao.countByName(name, processDTO.getMapCLSId());
             if(itemCount != 0){
-                continue;
+                // 但基本比例尺的航空图，联合作战图除外, 因为和地形图都属于基本比例尺地图，可能有地形图匹配了航空图或联合作战图
+                if(mapType != "航空图" && mapType != "联合作战图"){
+                    return;
+                }
             }
             //创建实体
             MapItem mapItem = new MapItem();
@@ -139,6 +143,7 @@ public class MapItemServiceImpl implements IMapItemService {
             mapItem.setName(file1.getName());
             mapItem.setAuthor(username);
             mapItem.setMapCLSId(processDTO.getMapCLSId());
+            mapItem.setMapType(mapType);
             mapItemDao.insert(mapItem);
 
             itemListId.add(mapItem.getId());
@@ -196,12 +201,14 @@ public class MapItemServiceImpl implements IMapItemService {
                 ProcessDTO processDTO = new ProcessDTO(
                     processingPath,
                     mapItemCLS.getId(),
+                    mapItemAddDTO.getMapType(),
                     mapItemAddDTO.getMetadataTable(),
                     mapItemAddDTO.isMatchMetadata(),
                     mapItemAddDTO.isCalcGeoInfo(),
                     mapItemAddDTO.isGenerateThumbnail(),
                     mapItemAddDTO.isGenerateTiles(),
-                    mapItemAddDTO.getServername());
+                    mapItemAddDTO.getServername()
+                    );
 
                 // mapItemList.add(initMapItem(mapItem,fileInfo.getPath(),savePath,processingPath, processDTO, fileInfo));
                 asyncService.initMapItem(mapItem,fileInfo.getPath(),savePath,processingPath, processDTO, fileInfo);
