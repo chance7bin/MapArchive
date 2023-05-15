@@ -7,10 +7,12 @@ import com.opengms.maparchivebackendprj.dao.IClassificationTreeDao;
 import com.opengms.maparchivebackendprj.dao.IMetadataDao;
 import com.opengms.maparchivebackendprj.dao.IMetadataTableDao;
 import com.opengms.maparchivebackendprj.dao.IMapItemCLSDao;
+import com.opengms.maparchivebackendprj.dao.impl.MetadataDaoImpl;
 import com.opengms.maparchivebackendprj.entity.bo.config.DataServer;
 import com.opengms.maparchivebackendprj.entity.bo.config.DataServerList;
 import com.opengms.maparchivebackendprj.entity.bo.mapItem.GeoInfo;
 import com.opengms.maparchivebackendprj.entity.enums.MapClassification;
+import com.opengms.maparchivebackendprj.entity.enums.MapTypeEnum;
 import com.opengms.maparchivebackendprj.entity.po.ClassificationTree;
 import com.opengms.maparchivebackendprj.entity.po.MetadataTable;
 import com.opengms.maparchivebackendprj.entity.po.MapItemCLS;
@@ -344,6 +346,17 @@ class MapArchiveBackendPrjApplicationTests {
 
         System.out.println();
 
+    }
+//    @Test
+//    void test1(){
+////        System.out.println(mapTypeEnum.valueOf("地形图"));
+////        for (MapTypeEnum item : MapTypeEnum.协同图)
+//        MapTypeEnum typeEnum = MapTypeEnum.valueOf(MapTypeEnum.class, "协同图");
+//        System.out.println(MapTypeEnum.valueOf(MapTypeEnum.class,"协同图"));
+//    }
+    @Test
+    void test1(){
+        System.out.println(metadataDao.findMetadataByOriginalNum("航空图","numAndYear","05-29(1964)","BASIC_SCALE_MAP_HUNDRED"));
     }
 
     @Test

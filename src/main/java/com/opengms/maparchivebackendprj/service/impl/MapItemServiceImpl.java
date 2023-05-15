@@ -130,12 +130,13 @@ public class MapItemServiceImpl implements IMapItemService {
         List<String> itemListId = new ArrayList<>();
         for (File file1 : fileList) {
             String name = file1.getName();
-            long itemCount = mapItemDao.countByName(name, processDTO.getMapCLSId());
-            if(itemCount != 0){
-                // 但基本比例尺的航空图，联合作战图除外, 因为和地形图都属于基本比例尺地图，可能有地形图匹配了航空图或联合作战图
-                if(mapType != "航空图" && mapType != "联合作战图"){
+            long itemCount = mapItemDao.countByName(name, processDTO.getMapCLSId(), mapType);
+            // 按元数据结合地图类型(如基本比例尺中的地图种类：协同图、地形图...)查询
+            if(itemCount != 0 && !mapType.equals("航空图") && !mapType.equals("联合作战图")){
+//                 但基本比例尺的航空图，联合作战图除外, 因为和地形图都属于基本比例尺地图，可能有地形图匹配了航空图或联合作战图
+//                if(mapType != "航空图" && mapType != "联合作战图"){
                     return;
-                }
+//                }
             }
             //创建实体
             MapItem mapItem = new MapItem();
@@ -180,7 +181,7 @@ public class MapItemServiceImpl implements IMapItemService {
         if (fileInfoList != null){
             for (FileInfo fileInfo : fileInfoList) {
                 String name = fileInfo.getFileName();
-                long itemCount = mapItemDao.countByName(name, mapItemAddDTO.getMapCLSId());
+                long itemCount = mapItemDao.countByName(name, mapItemAddDTO.getMapCLSId(), mapType);
                 // 查询名字，重复的不上传
                 if(itemCount != 0){
                     // 但基本比例尺的航空图，联合作战图除外, 因为和地形图都属于基本比例尺地图，可能有地形图匹配了航空图或联合作战图

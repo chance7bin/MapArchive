@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -23,13 +24,17 @@ public class MetadataServiceImplTests {
     IMetadataDao metadataDao;
     @Test
     void getBSMMetadata() {
+        Map<String,String> mapInfo = new HashMap<>();
+        mapInfo.put("type","2500");
+        mapInfo.put("matchField","图幅编号");
+        mapInfo.put("matchFieldAndYear","numAndYear");
         String filename = "05-48-008-A-1(1958).tif";
         String clsNameCn = "BASIC_SCALE_MAP_TWO_DOT_FIVE";
         String excelPath = "";
         String mapType = "";
         Map map = null;
         try {
-            map = metadataService.getBSMMetadata(filename, clsNameCn, mapType, excelPath);
+            map = metadataService.getBSMMetadata(filename, mapInfo, clsNameCn, mapType, excelPath);
         } catch (Exception e) {
             e.printStackTrace();
         }

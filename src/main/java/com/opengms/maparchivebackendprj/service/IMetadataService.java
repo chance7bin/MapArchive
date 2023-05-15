@@ -30,5 +30,11 @@ public interface IMetadataService {
 
     JsonResult countMetadata(SpecificFindDTO findDTO, String collection);
 
-    String get_english_name(String filename);
+    String get_english_name(String filename, Boolean delBlock);
+
+    String leftPad(int length, String number);
+
+    Map<String,String> timeService(String filename);
+
+    public Map<String, Object> matchData(String matchField, String matchFieldAndYear, String mapType, String excelPath, String formatFilename, String collection) throws Exception;
 }

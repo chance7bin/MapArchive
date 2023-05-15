@@ -15,6 +15,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @SpringBootTest
@@ -44,15 +45,16 @@ public class ToolsServiceImplTests {
     @Test
     void test1(){
         List list = new ArrayList<String>();
+        List map_list = new ArrayList<String>();
         BufferedReader reader;
         try {
             reader = new BufferedReader(new FileReader(
-                    "G:\\classDATA\\文件名\\jg_test.txt"));
+                    "F:\\classDATA\\处理程序\\jg_test.txt"));
             String line = reader.readLine();
             while (line != null) {
                 // read next line
-                line = reader.readLine();
                 list.add(line);
+                line = reader.readLine();
             }
             reader.close();
         } catch (IOException e) {
@@ -64,7 +66,13 @@ public class ToolsServiceImplTests {
             String filename = (String) e;
             Map<String, Object> map = null;
             try {
-                map = metadataServiceImpl.getBSMMetadata(filename,"BASIC_SCALE_MAP_FIFTY","地形图", null);
+//                Map<String,String> mapInfo = new HashMap<>();
+//                mapInfo.put("type","ONE");
+//                mapInfo.put("matchField","图幅编号");
+//                mapInfo.put("matchFieldAndYear","numAndYear");
+//                map = metadataServiceImpl.getBSMMetadata(filename,mapInfo, collection, "", excelPath);
+//                map = metadataMatchService.getAmericaMetadata(filename,"M07_01_07_02_01", "", null);
+                map = metadataServiceImpl.getMetadataByFilenameByType(filename, "fa8874aa-f488-4e7e-abbc-7bebb7657dc0", "", null);
             } catch (Exception exception) {
                 exception.printStackTrace();
             }
@@ -73,12 +81,28 @@ public class ToolsServiceImplTests {
             }
         });
         System.out.print(list_error);
+        System.out.print(list.size());
     }
 
     @Test
     void test2() throws Exception {
-        Map<String, Object> map = metadataServiceImpl.getBSMMetadata("05-49-A.B.tif","BASIC_SCALE_MAP_FIFTY","",null);
+//        Map<String, Object> map = metadataMatchService.getAmericaMetadata("E-05-01-01.tif","M07_01_07_02_01","",null);
+        Map<String, Object> map = metadataServiceImpl.getMetadataByFilenameByType("13-30-93.81.tif", "fa8874aa-f488-4e7e-abbc-7bebb7657dc0", "", null);
         System.out.print(map);
+    }
+    @Test
+    void test3() throws Exception {
+        // 判断是否包含中文
+//        String address = "07-50-宜-1.tif";
+//        Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
+//        Matcher m = p.matcher(address);
+//        System.out.print(m.find());
+
+        // 判断是否全为数字
+        String char_sign = "7-";
+        Pattern pattern = Pattern.compile("^[0-9]*$");
+        Boolean a = pattern.matcher(char_sign).matches();
+        System.out.print(a);
     }
 }
 

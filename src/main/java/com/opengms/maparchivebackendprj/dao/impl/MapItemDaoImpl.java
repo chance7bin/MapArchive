@@ -2,6 +2,7 @@ package com.opengms.maparchivebackendprj.dao.impl;
 
 import com.mongodb.client.result.DeleteResult;
 import com.opengms.maparchivebackendprj.dao.IMapItemDao;
+import com.opengms.maparchivebackendprj.entity.enums.MapTypeEnum;
 import com.opengms.maparchivebackendprj.entity.enums.StatusEnum;
 import com.opengms.maparchivebackendprj.entity.po.MapItem;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -201,10 +202,14 @@ public class MapItemDaoImpl implements IMapItemDao {
     }
 
     @Override
-    public long countByName(String mapItemName, String mapCLSId) {
+    public long countByName(String mapItemName, String mapCLSId, String mapType) {
         Query query = new Query();
         query.addCriteria(Criteria.where("name").is(mapItemName));
         query.addCriteria(Criteria.where("mapCLSId").is(mapCLSId));
+        if (!mapType.equals("")){       // 按地图类型查询
+            String mapFiled = MapTypeEnum.valueOf(MapTypeEnum.class,mapType).getField();
+            query.addCriteria(Criteria.where(mapFiled).is(mapType));
+        }
         return mongoTemplate.count(query, MapItem.class);
     }
 
