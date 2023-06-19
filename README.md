@@ -1,39 +1,103 @@
-# MapArchiveBackendPrj
+# MapArchive
 
-#### 介绍
-{**以下是 Gitee 平台说明，您可以替换此简介**
-Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN）。专为开发者提供稳定、高效、安全的云端软件开发协作平台
-无论是个人、团队、或是企业，都能够用 Gitee 实现代码托管、项目管理、协作开发。企业项目请看 [https://gitee.com/enterprises](https://gitee.com/enterprises)}
+## 项目介绍
 
-#### 软件架构
-软件架构说明
+本系统全称地图档案数字化管理系统平台（地图平台），用于对地图数字化成果进行统一存储管理和空间可视化分析。
 
 
-#### 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+## 前端项目
 
-#### 使用说明
+该仓库为项目的后端地址
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 参与贡献
-
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+前端地址：https://gitee.com/handsomeyangbo/mapsystemfront
 
 
-#### 特技
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+## 系统功能
+
+地图平台主要分为用户管理、地图管理、地图档案、地图分析四大模块。
+
+系统提供地图档案信息和地图分析功能，用户需要注册登录以获取操作地图管理模块的权限，超级管理员统一管理用户权限。
+
+地图平台地图管理模块为用户提供轻量级（单文件、压缩包）以及多层级（批量挂载）方式将地图数据按地图类别归类存储，并为用户提供数据下载接口。
+
+用户可在地图档案模块查看对应地图类型的地图数据，也可详细查看单幅地图的元数据信息和多层级瓦片信息。
+
+地图平台依据地图图幅信息，为每幅地图计算坐标范围，为用户提供地图空间化操作、查询。
+
+![image-20230619154037091](./doc/images/image-20230619154037091.png)
+
+
+
+## 功能截图
+
+### 用户管理
+
+<table>
+    <tr>
+        <td><img src="./doc/images/image-20230619154140501.png"/></td>
+        <td><img src="./doc/images/image-20230619154143507.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="./doc/images/image-20230619154152013.png"/></td>
+        <td><img src="./doc/images/image-20230619154158322.png"/></td>
+    </tr>
+</table>
+
+
+
+### 地图管理
+
+<table>
+    <tr>
+        <td><img src="./doc/images/image-20230619154450257.png"/></td>
+        <td><img src="./doc/images/image-20230619154500823.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="./doc/images/image-20230619154513888.png"/></td>
+        <td><img src="./doc/images/image-20230619154519639.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="./doc/images/image-20230619154531853.png"/></td>
+        <td><img src="./doc/images/image-20230619154602040.png"/></td> 
+    </tr>
+    <tr>
+        <td><img src="./doc/images/image-20230619154619095.png"/></td>
+    </tr>
+</table>
+
+
+
+### 地图档案
+
+<table>
+    <tr>
+        <td><img src="./doc/images/image-20230619154833427.png"/></td>
+        <td><img src="./doc/images/image-20230619154837877.png"/></td>
+    </tr>
+    <tr>
+        <td><img src="./doc/images/image-20230619154849174.png"/></td> 
+    	<td><img src="./doc/images/image-20230619155119856.png"/></td>
+    </tr>
+</table>
+
+
+
+
+
+### 地图分析
+
+<table>
+    <tr style="float:left">
+        <td><img src="./doc/images/image-20230619155216179.png" style="zoom: 67%;" /></td>
+        <td><img src="./doc/images/image-20230619155220180.png" style="zoom: 67%;" /></td>
+    </tr>
+</table>
+
+<table>
+    <tr>
+        <td><img src="./doc/images/image-20230619155231209.png"/></td> 
+    	<td><img src="./doc/images/image-20230619155234057.png"/></td>
+    </tr>
+</table>
