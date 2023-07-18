@@ -2,8 +2,7 @@ package com.opengms.maparchivebackendprj.dao.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import com.opengms.maparchivebackendprj.dao.IMetadataDao;
-import com.opengms.maparchivebackendprj.entity.dto.FindDTO;
-import com.opengms.maparchivebackendprj.entity.enums.MapClassification;
+import com.opengms.maparchivebackendprj.entity.enums.MapTypeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -60,8 +59,9 @@ public class MetadataDaoImpl implements IMetadataDao {
     @Override
     public List<JSONObject> findMetadataByOriginalNum(String mapType, String matchField, String filename, String collection) {
         Query query = new Query();
-        if (!mapType.equals("")){       // 基本比例尺中的地形图，联合作战图，协同图
-            query.addCriteria(Criteria.where("地图种类").is(mapType));
+        if (!mapType.equals("")){       // 按地图类型查询
+            String mapFiled = MapTypeEnum.valueOf(MapTypeEnum.class,mapType).getField();
+            query.addCriteria(Criteria.where(mapFiled).is(mapType));
         }
         query.addCriteria(Criteria.where(matchField).is(filename));
         return mongoTemplate.find(query, JSONObject.class, collection);
@@ -70,8 +70,9 @@ public class MetadataDaoImpl implements IMetadataDao {
     @Override
     public List<JSONObject> findMetadataByOriginalNumAndYear(String mapType, String matchFieldAndYear, String filename, String collection) {
         Query query = new Query();
-        if (!mapType.equals("")){       // 基本比例尺中的地形图，联合作战图，协同图
-            query.addCriteria(Criteria.where("地图种类").is(mapType));
+        if (!mapType.equals("")){       // 按地图类型查询
+            String mapFiled = MapTypeEnum.valueOf(MapTypeEnum.class,mapType).getField();
+            query.addCriteria(Criteria.where(mapFiled).is(mapType));
         }
         query.addCriteria(Criteria.where(matchFieldAndYear).is(filename));
         return mongoTemplate.find(query, JSONObject.class, collection);

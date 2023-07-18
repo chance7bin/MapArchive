@@ -58,7 +58,7 @@ public interface IMapItemDao {
 
     List<MapItem> findByName(String mapItemName, String mapCLSId);
 
-    long countByName(String mapItemName, String mapCLSId);
+    long countByName(String mapItemName, String mapCLSId, String mapType);
 
     List<MapItem> findByStatusAndHasNeedManual(List<StatusEnum> statusEnums, Map<String,Boolean> batchList, String mapCLSId, boolean hasNeedManual, Pageable pageable);
 
